@@ -34,7 +34,7 @@ Before (9)/After (11) volunteering with CCFRP, what was your general opinion of 
 
 ```{r Q9 Q11}
 
-beforeafter <- c('Positive', 'Somewhat positive', 'Neutral', 'Somewhat Negative', 'Negative', 'No opinion')
+beforeafter <- c('Positive', 'Somewhat positive', 'Neutral', 'Somewhat negative', 'Negative', 'No opinion')
 
 Q9 <- survey %>% select(Q9) %>% drop_na() %>% ggplot() + 
   geom_bar(aes(x = Q9, y = (..count..)/sum(..count..)*100)) +
@@ -102,7 +102,7 @@ Q9new/Q11new
 
 ba_plot <- Q9new/Q11new
 
-ggsave(here("Images","beforeafter.png"), plot = , width = 8, height = 6, dpi = 1000)
+ggsave(here("Images","beforeafter.png"), plot = ba_plot , width = 8, height = 6, dpi = 1000)
 
 ```
 
