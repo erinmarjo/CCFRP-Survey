@@ -56,6 +56,11 @@ Q11 <- survey %>% select(Q11) %>% drop_na() %>% ggplot() +
 
 #Q9/Q11
 
+Q9n <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))
+sum(Q9n$n)
+
+Q11n <- survey %>% select(Q11) %>% drop_na() %>% count(Q11= factor(Q11))
+sum(Q11n$n)
 
 
 Q9new <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))%>% 
@@ -94,6 +99,10 @@ Q11new <- survey %>% select(Q11) %>% drop_na() %>% count(Q11 = factor(Q11))%>%
 
 
 Q9new/Q11new
+
+ba_plot <- Q9new/Q11new
+
+ggsave(here("Images","beforeafter.png"), plot = , width = 8, height = 6, dpi = 1000)
 
 ```
 
