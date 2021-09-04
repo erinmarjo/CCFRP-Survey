@@ -1,0 +1,174 @@
+---
+title: "2021 CCFRP Angler Survey Analysis"
+author: "BR & EJ"
+date: "9/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+```
+
+```{r libraries}
+
+library(tidyverse)
+library(readxl)
+library(patchwork)
+library(here)
+
+```
+
+
+```{r read data}
+
+survey <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
+survey <- survey[-(1:2),]
+
+```
+
+### Questions 9 & 11
+
+Before (9)/After (11) volunteering with CCFRP, what was your general opinion of the creation of MPAs in California?
+
+```{r Q9 Q11}
+
+beforeafter <- c('Positive', 'Somewhat positive', 'Neutral', 'Somewhat Negative', 'Negative', 'No opinion')
+
+Q9 <- survey %>% select(Q9) %>% drop_na() %>% ggplot() + 
+  geom_bar(aes(x = Q9, y = (..count..)/sum(..count..)*100)) +
+  scale_y_continuous(limits = c(0,70)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nBefore', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank())
+
+
+Q11 <- survey %>% select(Q11) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q11, y = (..count..)/sum(..count..)*100)) +
+  scale_y_continuous(limits = c(0,70)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nAfter', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank())
+  
+
+#Q9/Q11
+
+
+
+Q9new <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q9, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", aes(fill = Q9, color = Q9))+
+  scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,72)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nBefore Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+Q11new <- survey %>% select(Q11) %>% drop_na() %>% count(Q11 = factor(Q11))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q11, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", aes(fill = Q11, color = Q11))+
+  scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,72)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nAfter Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+
+Q9new/Q11new
+
+```
+
+
+### Questions 16
+
+Have you experienced a difference in fishing in an MPA versus outside of an MPA?
+
+I catch more fish when fishing inside…
+
+I catch a greater diversity of fish species when fishing inside…
+
+I catch larger fish when I fish inside
+
+```{r Q16-Q18}
+
+fishingarea <- c('MPAs', 'Open to Fishing', 'Dont Know', 'No Difference')
+
+Q16 <- survey %>% select(Q16) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q16, y = (..count..)/sum(..count..)*100)) +
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = 'Percent')+
+  theme_bw() + 
+  theme(panel.grid = element_blank())
+
+Q17 <- survey %>% select(Q17) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q17, y = (..count..)/sum(..count..)*100)) +
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = 'Percent')+
+  theme_bw() + 
+  theme(panel.grid = element_blank())
+
+Q18 <- survey %>% select(Q18) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q18, y = (..count..)/sum(..count..)*100)) +
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = 'Percent')+
+  theme_bw() + 
+  theme(panel.grid = element_blank())
+
+Q16/Q17/Q18
+
+```
+
+
+```{r}
+
+money <- c('$0', '$1 - $20', '$21 - $50', '$51 - 100', '$101 - $500', '>$500')
+
+Q20 <- survey %>% select(Q20) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q20, y = (..count..)/sum(..count..)*100)) +
+  theme_classic() + scale_y_continuous(limits = c(0,60)) +
+  scale_x_discrete(labels = money) +
+  labs(x = 'How Much Would You Pay to Fish in an MPA?', y = 'Percent')
+
+Q20
+
+
+```
+
+```{r}
+
+managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Dont Know')
+
+Q26 <- survey %>% select(Q26) %>% drop_na() %>% ggplot() +
+  geom_bar(aes(x = Q26, y = (..count..)/sum(..count..)*100)) +
+  theme_classic() + scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = 'How Well Managed are California Fisheries?', y = 'Percent')
+
+Q26
+
+
+```
+
+
