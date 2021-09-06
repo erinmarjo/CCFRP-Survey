@@ -1,8 +1,12 @@
 ---
 title: "2021 CCFRP Angler Survey Analysis"
-author: "BR & EJ"
-date: "9/4/2021"
-output: html_document
+author: "Cal Poly Team"
+date: "September 2021"
+output: 
+  prettydoc::html_pretty:
+    #toc: true
+    #toc_depth: 4
+    theme: tactile
 ---
 
 ```{r setup, include=FALSE}
@@ -21,48 +25,26 @@ library(here)
 ```
 
 
-```{r read data}
+```{r read data, echo = F, eval = T}
 
 survey <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
 survey <- survey[-(1:2),]
 
 ```
 
-### Questions 9 & 11
+### Marine Protected Areas
 
-Before (9)/After (11) volunteering with CCFRP, what was your general opinion of the creation of MPAs in California?
+#### Questions 9 & 11
 
-```{r Q9 Q11}
+Before and after volunteering with CCFRP, what was your general opinion of the creation of MPAs in California?
 
+```{r Q9 Q11, echo = F, eval = T}
+
+## answer option list
 beforeafter <- c('Positive', 'Somewhat positive', 'Neutral', 'Somewhat negative', 'Negative', 'No opinion')
 
-Q9 <- survey %>% select(Q9) %>% drop_na() %>% ggplot() + 
-  geom_bar(aes(x = Q9, y = (..count..)/sum(..count..)*100)) +
-  scale_y_continuous(limits = c(0,70)) +
-  scale_x_discrete(labels = beforeafter) +
-  labs(x = '\nBefore', y = 'Percent') +
-  theme_bw() + 
-  theme(panel.grid = element_blank())
 
-
-Q11 <- survey %>% select(Q11) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q11, y = (..count..)/sum(..count..)*100)) +
-  scale_y_continuous(limits = c(0,70)) +
-  scale_x_discrete(labels = beforeafter) +
-  labs(x = '\nAfter', y = 'Percent') +
-  theme_bw() + 
-  theme(panel.grid = element_blank())
-  
-
-#Q9/Q11
-
-Q9n <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))
-sum(Q9n$n)
-
-Q11n <- survey %>% select(Q11) %>% drop_na() %>% count(Q11= factor(Q11))
-sum(Q11n$n)
-
-
+## figure creation
 Q9new <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
@@ -96,63 +78,56 @@ Q11new <- survey %>% select(Q11) %>% drop_na() %>% count(Q11 = factor(Q11))%>%
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none")
+```
 
+
+
+
+```{r Q9 Q11 output, fig.height= 6, fig.width= 8, fig.align= "center", echo = F, eval = T}
 
 Q9new/Q11new
 
-ba_plot <- Q9new/Q11new
+#ba_plot <- Q9new/Q11new
 
 #ggsave(here("Images","beforeafter.png"), plot = ba_plot , width = 8, height = 6, dpi = 1000)
 
 ```
 
+```{r Q9 Q11 sample size, eval = F, echo = F}
 
-### Question 16 a-c
+## sample size
+
+Q9n <- survey %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))
+sum(Q9n$n) ## 150 anglers
+
+Q11n <- survey %>% select(Q11) %>% drop_na() %>% count(Q11= factor(Q11))
+sum(Q11n$n) ## 150 anglers
+
+```
+
+### General
+
+#### Questions 16 a-c
 
 Have you experienced a difference in fishing in an MPA versus outside of an MPA?
 
-I catch more fish when fishing inside…
+* I catch more fish when fishing inside...
 
-I catch a greater diversity of fish species when fishing inside…
+* I catch a greater diversity of fish species when fishing inside...
 
-I catch larger fish when I fish inside
+* I catch larger fish when I fish inside...
 
-```{r Q16-Q18}
+```{r Q16-Q18, echo = F, eval = T}
 
+## answer option list
 fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
 
-Q16 <- survey %>% select(Q16) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q16, y = (..count..)/sum(..count..)*100)) +
-  scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nHigher Abundance', y = 'Percent')+
-  theme_bw() + 
-  theme(panel.grid = element_blank())
-
-Q17 <- survey %>% select(Q17) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q17, y = (..count..)/sum(..count..)*100)) +
-  scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nGreater Diversity', y = 'Percent')+
-  theme_bw() + 
-  theme(panel.grid = element_blank())
-
-Q18 <- survey %>% select(Q18) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q18, y = (..count..)/sum(..count..)*100)) +
-  scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nLarger Size', y = 'Percent')+
-  theme_bw() + 
-  theme(panel.grid = element_blank())
-
-Q16/Q17/Q18
-
-
+## figure creation
 Q16new <- survey %>% select(Q16) %>% drop_na() %>% count(Q16 = factor(Q16))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = Q16, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill = "#999999", color = "#333333", size = 1)+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 3)+
@@ -167,7 +142,7 @@ Q17new <- survey %>% select(Q17) %>% drop_na() %>% count(Q17 = factor(Q17))%>%
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = Q17, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill = "#999999", color = "#333333", size = 1)+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 3)+
@@ -182,7 +157,7 @@ Q18new <- survey %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))%>%
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = Q18, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill = "#999999", color = "#333333", size = 1)+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 3)+
@@ -193,6 +168,13 @@ Q18new <- survey %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))%>%
   theme(panel.grid = element_blank(),
         legend.position = "none")
 
+```
+
+
+```{r Q16-Q18 output, fig.height= 10, fig.width= 8, fig.align= "center", echo = F, eval = T}
+
+Q16new/Q17new/Q18new
+
 MPAREF_plot <- Q16new/Q17new/Q18new
 
 # ggsave(here("Images","mpa_v_ref.png"), plot = MPAREF_plot , width = 8, height = 6, dpi = 1000)
@@ -200,16 +182,28 @@ MPAREF_plot <- Q16new/Q17new/Q18new
 
 ```
 
+```{r Q16-18 sample size, eval = F, echo = F}
 
-```{r}
+## sample size 
+Q16n <- survey %>% select(Q16) %>% drop_na() %>% count(Q16 = factor(Q16))
+sum(Q16n$n) ## 107
+
+Q17n <- survey %>% select(Q17) %>% drop_na() %>% count(Q17 = factor(Q17))
+sum(Q17n$n) ## 107
+
+Q18n <- survey %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))
+sum(Q18n$n) ## 107
+
+
+```
+
+#### Question 18
+
+Hypothetically, how much would you be willing to pay for one day of catch and release fishing inside an MPA while not participating on a CCFRP trip?
+
+```{r Q20, echo = F, eval= T}
 
 money <- c('$0', '$1 - $20', '$21 - $50', '$51 - 100', '$101 - $500', '>$500')
-
-Q20 <- survey %>% select(Q20) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q20, y = (..count..)/sum(..count..)*100)) +
-  theme_classic() + scale_y_continuous(limits = c(0,60)) +
-  scale_x_discrete(labels = money) +
-  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent')
 
 Q20new <- survey %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))%>% 
     mutate(pct = n/sum(n)*100,
@@ -226,19 +220,25 @@ Q20new <- survey %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))%>%
   theme(panel.grid = element_blank(),
         legend.position = "none")
 
+```
+
+
+```{r Q20 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval= T}
+
 Q20new
 
 ```
 
-```{r}
+### Natural Resource Conservation
+
+#### Question 23
+
+In your opinion, how well are California groundfish stocks managed? 
+
+```{r Q26, echo = F, eval = T}
 
 managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
 
-Q26 <- survey %>% select(Q26) %>% drop_na() %>% ggplot() +
-  geom_bar(aes(x = Q26, y = (..count..)/sum(..count..)*100)) +
-  theme_classic() + scale_y_continuous(limits = c(0,40)) +
-  scale_x_discrete(labels = managed) +
-  labs(x = 'How Well Managed are California Fisheries?', y = 'Percent')
 
 Q26new <- survey %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>% 
     mutate(pct = n/sum(n)*100,
@@ -255,8 +255,117 @@ Q26new <- survey %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>%
   theme(panel.grid = element_blank(),
         legend.position = "none")
 
+```
+
+
+```{r Q26 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
+
 Q26new
 
 ```
 
+### Basic Demographics
 
+#### Questions 28 - 31
+
+```{r Q31-Q34, echo = F, eval = T}
+
+## figure creation
+Q31new <- survey %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q31, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete(labels = c('Male', 'Female', 'Non-binary', 'Prefer not to state', 'Other')) +
+  labs(x = '\nGender Identity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+
+Q32new <- survey %>% select(Q32) %>% drop_na() %>% count(Q32 = factor(Q32))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q32, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = c('18-24', '25-34', '35-44','45-54','55-64','65 and up')) +
+  labs(x = '\nAge', y = '\nPercent') +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12))
+
+
+Q33new <- survey %>% select(Q33) %>% drop_na() %>% count(Q33 = factor(Q33))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q33, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", fill = "#3333FF", color = "#000066", size = 1)+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,60)) +
+  scale_x_discrete(labels = c('Less than \nhigh school degree', 'High school \ndegree', 'Associates degree \nor Tech school', 'Some college', 'College degree', 'Graduate degree')) +
+  labs(x = '\nEducation', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+Q34new <- survey %>% select(Q34) %>% drop_na() %>% count(Q34 = factor(Q34))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q34, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = 0.0,
+            hjust = -0.7,
+            size = 3)+
+  scale_y_continuous(limits = c(0,25)) +
+  scale_x_discrete(labels = c('<$25k', '$25-$35k', '$35-$50k', '$50-$75k', '$75-$100k', '$100-$150k', '$150-$200k', '>$200k', 'Decline to State')) +
+  labs(x = '\nIncome', y = '\nPercent') +
+  coord_flip()+
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+```
+
+I identify as...
+
+```{r Q31 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
+
+Q31new
+
+```
+
+What is your age?
+
+```{r Q32 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
+
+Q32new
+
+```
+
+What is the highest level of education you have completed?
+
+```{r Q33 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
+
+Q33new
+
+```
+
+Which of the following categories best describes your household’s total annual income before taxes in 2020? 
+
+```{r Q34 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
+
+Q34new
+
+```
