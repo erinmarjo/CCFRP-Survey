@@ -102,12 +102,12 @@ Q9new/Q11new
 
 ba_plot <- Q9new/Q11new
 
-ggsave(here("Images","beforeafter.png"), plot = ba_plot , width = 8, height = 6, dpi = 1000)
+#ggsave(here("Images","beforeafter.png"), plot = ba_plot , width = 8, height = 6, dpi = 1000)
 
 ```
 
 
-### Questions 16
+### Question 16 a-c
 
 Have you experienced a difference in fishing in an MPA versus outside of an MPA?
 
@@ -119,7 +119,7 @@ I catch larger fish when I fish inside
 
 ```{r Q16-Q18}
 
-fishingarea <- c('MPAs', 'Open to Fishing', 'Dont Know', 'No Difference')
+fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
 
 Q16 <- survey %>% select(Q16) %>% drop_na() %>% ggplot() +
   geom_bar(aes(x = Q16, y = (..count..)/sum(..count..)*100)) +
@@ -147,6 +147,57 @@ Q18 <- survey %>% select(Q18) %>% drop_na() %>% ggplot() +
 
 Q16/Q17/Q18
 
+
+Q16new <- survey %>% select(Q16) %>% drop_na() %>% count(Q16 = factor(Q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,80)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+Q17new <- survey %>% select(Q17) %>% drop_na() %>% count(Q17 = factor(Q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,80)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+Q18new <- survey %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,80)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+
+MPAREF_plot <- Q16new/Q17new/Q18new
+
+# ggsave(here("Images","mpa_v_ref.png"), plot = MPAREF_plot , width = 8, height = 6, dpi = 1000)
+
+
 ```
 
 
@@ -158,16 +209,30 @@ Q20 <- survey %>% select(Q20) %>% drop_na() %>% ggplot() +
   geom_bar(aes(x = Q20, y = (..count..)/sum(..count..)*100)) +
   theme_classic() + scale_y_continuous(limits = c(0,60)) +
   scale_x_discrete(labels = money) +
-  labs(x = 'How Much Would You Pay to Fish in an MPA?', y = 'Percent')
+  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent')
 
-Q20
+Q20new <- survey %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q20, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,80)) +
+  scale_x_discrete(labels = money) +
+  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
 
+Q20new
 
 ```
 
 ```{r}
 
-managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Dont Know')
+managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
 
 Q26 <- survey %>% select(Q26) %>% drop_na() %>% ggplot() +
   geom_bar(aes(x = Q26, y = (..count..)/sum(..count..)*100)) +
@@ -175,8 +240,22 @@ Q26 <- survey %>% select(Q26) %>% drop_na() %>% ggplot() +
   scale_x_discrete(labels = managed) +
   labs(x = 'How Well Managed are California Fisheries?', y = 'Percent')
 
-Q26
+Q26new <- survey %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 3)+
+  scale_y_continuous(limits = c(0,80)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
 
+Q26new
 
 ```
 
