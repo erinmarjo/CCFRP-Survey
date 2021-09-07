@@ -229,6 +229,16 @@ Q20new
 
 ```
 
+
+```{r Q20 sample size, echo = F, eval = F}
+
+## sample size 
+Q20n <- survey %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))
+sum(Q20n$n) ## 145
+
+```
+
+
 ### Natural Resource Conservation
 
 #### Question 23
@@ -261,6 +271,14 @@ Q26new <- survey %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>%
 ```{r Q26 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
 
 Q26new
+
+```
+
+```{r Q23 sample size, echo = F, eval = F}
+
+## sample size 
+Q23n <- survey %>% select(Q23) %>% drop_na() %>% count(Q23 = factor(Q23))
+sum(Q23n$n) ## 148
 
 ```
 
@@ -367,5 +385,28 @@ Which of the following categories best describes your household’s total annual
 ```{r Q34 output, fig.height= 6, fig.width= 10, fig.align= "center", echo = F, eval = T}
 
 Q34new
+
+```
+
+
+
+```{r Q31-Q34 sample size, echo = F, eval = F}
+
+## 
+Q31n <- survey %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))
+sum(Q31n$n) ## 148
+
+Q32n <- survey %>% select(Q32) %>% drop_na() %>% count(Q32 = factor(Q32))
+sum(Q32n$n) ## 148
+
+
+##
+Q33n <- survey %>% select(Q33) %>% drop_na() %>% count(Q33 = factor(Q33))
+sum(Q33n$n) ## 148
+
+
+## annual income question
+Q34n <- survey %>% select(Q34) %>% drop_na() %>% count(Q34 = factor(Q34))
+sum(Q34n$n) ## 146
 
 ```

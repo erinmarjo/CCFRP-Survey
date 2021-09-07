@@ -1,0 +1,54 @@
+---
+title: "2021 CCFRP Survey Zip"
+author: "Erin Johnston"
+date: "9/6/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(tidyverse)
+library(readxl)
+library(patchwork)
+library(here)
+
+
+```
+
+```{r read data, echo = F, eval = T}
+
+## read in our data
+surveyzip <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
+surveyzip <- surveyzip[-(1:2),] %>%
+  rename(ZIP_CODE = Q30)%>%
+  mutate(ZIP_CODE = as.numeric(ZIP_CODE))
+
+
+## lat longs for all US zip codes
+## I found these lat and longs at the following GitHub 
+## https://gist.github.com/erichurst/7882666
+## saved it in a regular text file
+US_zip <- read.table(here("Data", "US_Zip_Locations.txt"), header = T, sep = ",") %>%
+  rename(ZIP_CODE = ZIP)
+
+
+## joined by zip codes from ccfrp survey recipients
+survey_US_zip <- left_join(surveyzip, US_zip, by = "ZIP_CODE")
+
+## length(unique(survey_US_zip$ZIP_CODE))
+## There are 116 unique zip codes 
+
+## counted by number of survey recipients in each zip code
+CCFRP_angler_ziploc <- survey_US_zip %>%
+  filter(Progress == 100) %>%
+  count(ZIP_CODE, LAT, LNG) %>%
+  drop_na()
+
+write_csv(CCFRP_angler_ziploc, here("Data", "CCFRP_angler_ziploc.csv"))
+
+```
