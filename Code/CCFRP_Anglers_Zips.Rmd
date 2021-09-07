@@ -48,6 +48,17 @@ CCFRP_angler_ziploc <- survey_US_zip %>%
   count(ZIP_CODE, LAT, LNG) %>%
   drop_na()
 
-write_csv(CCFRP_angler_ziploc, here("Data", "CCFRP_angler_ziploc.csv"))
+
+CCFRP_angler_ziploc2 <- survey_US_zip %>%
+  filter(Progress == 100) %>%
+  select(ZIP_CODE) %>%
+  drop_na()
+
+CCFRP_angler_ziploc3 <- left_join(CCFRP_angler_ziploc2, CCFRP_angler_ziploc, by = "ZIP_CODE") %>%
+  drop_na()
+
+#write_csv(CCFRP_angler_ziploc, here("Data", "CCFRP_angler_ziploc.csv"))
+
+#write_csv(CCFRP_angler_ziploc3, here("Data", "CCFRP_angler_ziploc_n.csv"))
 
 ```
