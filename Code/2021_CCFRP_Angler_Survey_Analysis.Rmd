@@ -30,6 +30,11 @@ library(here)
 survey <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
 survey <- survey[-(1:2),]
 
+
+survey2 <- read_excel(here("Data", "CCFRP_angler_survey_2021_data_2021-09-13.xlsx"))
+survey2 <- survey2[-(1:2),]
+
+
 ```
 
 ### Marine Protected Areas
@@ -274,11 +279,11 @@ Q26new
 
 ```
 
-```{r Q23 sample size, echo = F, eval = F}
+```{r Q26 sample size, echo = F, eval = F}
 
 ## sample size 
-Q23n <- survey %>% select(Q23) %>% drop_na() %>% count(Q23 = factor(Q23))
-sum(Q23n$n) ## 148
+Q26n <- survey %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))
+sum(Q26n$n) ## 148
 
 ```
 
@@ -289,7 +294,7 @@ sum(Q23n$n) ## 148
 ```{r Q31-Q34, echo = F, eval = T}
 
 ## figure creation
-Q31new <- survey %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))%>% 
+Q31new <- survey2 %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = Q31, y = pct, label = paste0(pct, "%")))+
@@ -319,7 +324,8 @@ Q32new <- survey %>% select(Q32) %>% drop_na() %>% count(Q32 = factor(Q32))%>%
   theme_bw() +
   theme(panel.grid = element_blank(),
         legend.position = "none",
-        axis.title=element_text(size=12))
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
 
 
 Q33new <- survey %>% select(Q33) %>% drop_na() %>% count(Q33 = factor(Q33))%>% 
@@ -410,3 +416,265 @@ Q34n <- survey %>% select(Q34) %>% drop_na() %>% count(Q34 = factor(Q34))
 sum(Q34n$n) ## 146
 
 ```
+
+
+
+
+### For Snapshot Analysis
+
+```{r}
+
+beforeafter2 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
+
+ss9 <- survey2 %>% select(Q9) %>% drop_na() %>% count(Q9 = factor(Q9))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q9, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  #, aes(fill = Q9, color = Q9)
+  #scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  #scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter2) +
+  labs(x = '\nBefore Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss11 <- survey2 %>% select(Q11) %>% drop_na() %>% count(Q11 = factor(Q11))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q11, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  # , aes(fill = Q11, color = Q11)
+  # scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  # scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter2) +
+  labs(x = '\nAfter Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss9and11 <- ss9/ss11
+
+#ggsave(here("Images","ss9_11.png"), plot = ss9and11 , width = 8, height = 6, dpi = 1000)
+
+ss17n <- survey2 %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))
+sum(ss17n$n)
+
+```
+
+
+```{r}
+
+ss16 <- survey2 %>% select(Q16) %>% drop_na() %>% count(Q16 = factor(Q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss17 <- survey2 %>% select(Q17) %>% drop_na() %>% count(Q17 = factor(Q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss18 <- survey2 %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+mpa_ref <- ss16/ss17/ss18
+
+# ggsave(here("Images","ss16_18.png"), plot = mpa_ref , width = 8, height = 6, dpi = 1000)
+
+```
+
+
+```{r}
+
+ss20 <- survey2 %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q20, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = money) +
+  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+#ggsave(here("Images","ss20.png"), plot = ss20 , width = 8, height = 6, dpi = 1000)
+
+#Q20n <- survey2 %>% select(Q20) %>% drop_na() %>% count(Q20 = factor(Q20))
+#sum(Q20n$n)
+
+```
+
+```{r}
+
+ss26 <- survey2 %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ggsave(here("Images","ss26.png"), plot = ss26 , width = 8, height = 6, dpi = 1000)
+
+# ss26n <- survey2 %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))
+# sum(ss26n$n)
+
+```
+
+```{r}
+
+ss31 <- survey2 %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q31, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete(labels = c('Male', 'Female', 'Non-binary', 'Prefer not to state', 'Other')) +
+  labs(x = '\nGender Identity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+ss32 <- survey2 %>% select(Q32) %>% drop_na() %>% count(Q32 = factor(Q32))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q32, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = c('18-24', '25-34', '35-44','45-54','55-64','65 and up')) +
+  labs(x = '\nAge', y = '\nPercent') +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+ss33 <- survey2 %>% select(Q33) %>% drop_na() %>% count(Q33 = factor(Q33))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q33, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,60)) +
+  scale_x_discrete(labels = c('Less than \nhigh school degree', 'High school \ndegree', 'Associates degree \nor Tech school', 'Some college', 'College degree', 'Graduate degree')) +
+  labs(x = '\nEducation', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss34 <- survey2 %>% select(Q34) %>% drop_na() %>% count(Q34 = factor(Q34))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = Q34, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,25)) +
+  scale_x_discrete(labels = c('<$25k', '$25-\n$35k', '$35-\n$50k', '$50-\n$75k', '$75-\n$100k', '$100-\n$150k', '$150-\n$200k', '>$200k', 'Decline \nto State')) +
+  labs(x = '\nIncome', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+#ggsave(here("Images","ss34.png"), plot = ss34 , width = 8, height = 6, dpi = 1000)
+
+ss31n <- survey2 %>% select(Q31) %>% drop_na() %>% count(Q31 = factor(Q31))
+sum(ss31n$n) ## 200
+
+ss32n <- survey2 %>% select(Q32) %>% drop_na() %>% count(Q32 = factor(Q32))
+sum(ss32n$n) ## 199
+
+
+##
+ss33n <- survey2 %>% select(Q33) %>% drop_na() %>% count(Q33 = factor(Q33))
+sum(ss33n$n) ## 198
+
+ss34n <- survey2 %>% select(Q34) %>% drop_na() %>% count(Q34 = factor(Q34))
+sum(ss34n$n) ## 196
+
+```
+
