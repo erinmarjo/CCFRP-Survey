@@ -22,7 +22,7 @@ library(here)
 ```{r read data, echo = F, eval = T}
 
 ## read in our data
-surveyzip <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
+surveyzip <- read_excel(here("Data", "CCFRP_angler_survey_2021_data_2021-09-13.xlsx"))
 surveyzip <- surveyzip[-(1:2),] %>%
   rename(ZIP_CODE = Q30)%>%
   mutate(ZIP_CODE = as.numeric(ZIP_CODE))
@@ -57,8 +57,8 @@ CCFRP_angler_ziploc2 <- survey_US_zip %>%
 CCFRP_angler_ziploc3 <- left_join(CCFRP_angler_ziploc2, CCFRP_angler_ziploc, by = "ZIP_CODE") %>%
   drop_na()
 
-#write_csv(CCFRP_angler_ziploc, here("Data", "CCFRP_angler_ziploc.csv"))
+#write_csv(CCFRP_angler_ziploc, here("Data", "CCFRP_angler_ziploc_2021-09-13.csv"))
 
-#write_csv(CCFRP_angler_ziploc3, here("Data", "CCFRP_angler_ziploc_n.csv"))
+#write_csv(CCFRP_angler_ziploc3, here("Data", "CCFRP_angler_ziploc_n_2021-09-13.csv"))
 
 ```
