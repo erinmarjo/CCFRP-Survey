@@ -32,6 +32,7 @@ survey <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
 survey <- survey[-(1:2),]
 
 
+
 ## updated dataset, pulled 9/13
 survey2 <- read_excel(here("Data", "CCFRP_angler_survey_2021_data_2021-09-13.xlsx"))
 survey2 <- survey2[-(1:2),]
