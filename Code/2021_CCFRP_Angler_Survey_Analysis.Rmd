@@ -27,10 +27,12 @@ library(here)
 
 ```{r read data, echo = F, eval = T}
 
+## original data pulled 9/4
 survey <- read_excel(here("Data", "CCFRP_angler_survey_2021_data.xlsx"))
 survey <- survey[-(1:2),]
 
 
+## updated dataset, pulled 9/13
 survey2 <- read_excel(here("Data", "CCFRP_angler_survey_2021_data_2021-09-13.xlsx"))
 survey2 <- survey2[-(1:2),]
 
@@ -422,6 +424,19 @@ sum(Q34n$n) ## 146
 
 ### For Snapshot Analysis
 
+From this point forward, all graphs are set up the same way - Standard ggplot grey color, larger font size etc. These are the graphs that made it into the google doc.
+
+**FONT SIZE**
+To change the size of the percentages above bars, change the `size` argument in geom_text. To change the size of the axis title or text, change the 'size' argument inside of the 'theme' function --this should be the last function on the end of each ggplot.
+
+**PLOT COLOR**
+-For bars that are all one color: include a `fill` and `color` argument inside of geom_col(), but OUTSIDE of the aestheic function `aes()`. Assign a fill and color using hexidecimal ggplot colors. Examples are '#000666', #CC6600' which have to be in quotes. You can find all the colors here: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/. --SEE LINE 337 FOR EXAMPLE
+
+-For bars that are different colors, assign the colors manually. Add a `fill` and `color` argument INSIDE of `aes()` inside of `geom_col()`. Then add two more functions to ggplot: `scale_fill_manual()` and `scale_color_manual()` with the designated colors inside. -- SEE LINE 76, 77, & 78 FOR EXAMPLE
+
+**ORIENTATION**
+To turn the bars horizonally, add the function `coord_flip()` to ggplot
+
 ```{r}
 
 beforeafter2 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
@@ -470,8 +485,7 @@ ss9and11 <- ss9/ss11
 
 #ggsave(here("Images","ss9_11.png"), plot = ss9and11 , width = 8, height = 6, dpi = 1000)
 
-ss17n <- survey2 %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))
-sum(ss17n$n)
+
 
 ```
 
@@ -531,6 +545,17 @@ ss18 <- survey2 %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))%>%
 
 mpa_ref <- ss16/ss17/ss18
 
+##check samplesize
+
+# ss16n <- survey2 %>% select(Q16) %>% drop_na() %>% count(Q16 = factor(Q16))
+# sum(ss16n$Q16) ##141
+# 
+# ss17n <- survey2 %>% select(Q17) %>% drop_na() %>% count(Q17 = factor(Q17))
+# sum(ss17n$n) ##141
+# 
+# ss18n <- survey2 %>% select(Q18) %>% drop_na() %>% count(Q18 = factor(Q18))
+# sum(ss18n$n) ## 141
+
 # ggsave(here("Images","ss16_18.png"), plot = mpa_ref , width = 8, height = 6, dpi = 1000)
 
 ```
@@ -581,7 +606,7 @@ ss26 <- survey2 %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))%>%
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
-ggsave(here("Images","ss26.png"), plot = ss26 , width = 8, height = 6, dpi = 1000)
+#ggsave(here("Images","ss26.png"), plot = ss26 , width = 8, height = 6, dpi = 1000)
 
 # ss26n <- survey2 %>% select(Q26) %>% drop_na() %>% count(Q26 = factor(Q26))
 # sum(ss26n$n)

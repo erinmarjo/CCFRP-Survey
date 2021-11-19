@@ -1,0 +1,2193 @@
+---
+title: "CCFRP Angler Survey Analysis"
+author: "Erin Johnston"
+date: 
+output: 
+  prettydoc::html_pretty:
+    toc: TRUE
+    toc_depth: 3
+    theme: architect
+---
+
+
+<a id="top"></a>
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = F,
+                      message = F)
+
+```
+
+
+```{r packages}
+
+library(tidyverse)    ## general
+library(here)         ## calling data
+library(knitr)        ## general
+library(kableExtra)   ## for kable styling
+library(patchwork)    ## for combining plots
+library(ggsci)        ## for color mixer
+library(lemon)        ## for brackets
+library(ggpubr)       ## for combining plots & common legend
+
+```
+
+### Summary of changes made in excel
+
+**Please see information script for a full list of changes**
+
+* Changes for question about first year of volunteering:
+  
+  * if there was a question mark, question mark was removed
+  
+  * if angler started volunteering 'the first year', institution was checked. If CP or MLML was the main institution the angler volunteers with 'the first year' = 2007. If SIO, UCSB, BML, HSU was the main institutuion, 'the first year' = 2017.
+  
+  * if the language referred to the number of years volunteered, the year was put as 2021-the anglers response. example '8 years ago' would be 2021-8 = 2013
+  
+  * If range of years, the most conservative year was used except if the year was not within the study period (2007-2021)
+  
+
+* Changes for interconnectedness with nature question:
+  
+  * Explanation of number erased
+  
+  * If range of numbers (only one case), the most conservative number was used
+
+```{r data and cleaning}
+
+
+survey_dat <- read_csv(here("Data", "2021-11-17_CCFRP_Angler_Survey_values_corr.csv"))
+
+survey_dat <- survey_dat[-c(1:2),]
+##297 responses
+
+names(survey_dat) <- tolower(names(survey_dat))
+
+survey_dat_clean <- survey_dat %>%
+  filter(finished == 1,
+         distributionchannel != "preview") 
+
+survey_dat_clean <- survey_dat_clean %>%
+  mutate(unanswered = rowSums(is.na(survey_dat_clean))) %>%
+  ## to get rid of the responses where every single question was unanswered.
+  filter(unanswered < 55) %>%
+  mutate(q1 = as.numeric(q1))
+
+
+```
+
+
+[Go to top](#top)
+
+
+# Summary of Data
+
+## Section 1) CCFRP Angler Involvement
+
+### 1. What year did you first volunteer with CCFRP?
+
+```{r q1 n, echo = F}
+
+q1 <- survey_dat_clean %>%
+  count(q1)
+
+kable(q1, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered", position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+### 2. How often do you volunteer with CCFRP?
+
+**1 = "Every year"**
+
+**2 = "Every few years"**
+
+**3 = "Infrequently (1-2 years only)**
+
+**4 = "Never"**
+
+```{r q2 n, echo = F}
+
+q2 <- survey_dat_clean %>%
+  count(q2)
+
+kable(q2, table.attr = "style='width:30%;'") %>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+
+### 3. How many trips have you gone on with CCFRP?
+
+**1 = "1"**
+
+**2 = "2-5"**
+
+**3 = "6-10"**
+
+**4 = "11-19"**
+
+**5 = "20+"**
+
+```{r q3 n, echo = F}
+
+q3 <- survey_dat_clean %>%
+  count(q3)
+
+kable(q3, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left") 
+
+#%>%  kable_styling(full_width = T, position = "float_left", font_size = 16)
+
+```
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 4. What institution have you volunteered with most?
+
+**1 = "Humboldt State University"**
+
+**2 = "Bodega Marine Laboratory"**
+
+**3 = "Moss Landing Marine Laboratories"**
+
+**4 = "Cal Poly SLO"**
+
+**5 = "UC Santa Barbara"**
+
+**6 = "Scripps Institution of Oceanography"**
+
+```{r q4 n, echo = F}
+
+q4 <- survey_dat_clean %>%
+  count(q4)
+
+kable(q4, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 5. Why did you volunteer to participate on your last CCFRP fishing trip?
+
+**1 = "To enjoy fishing whenever I can"**
+
+**2 = "To fish inside the marine protected areas (MPAs)"**
+
+**3 = "To participate in citizen science"**
+
+**4 = "To give back to fisheries resources"**
+
+**5 = "To learn about rockfish, lingcode, and other species we catch on these trips"**
+
+**6 = "Other (specify)"**
+
+```{r q5, echo=F}
+
+# q5 <- survey_dat_clean %>%
+#   count(q5)
+
+q5 <- survey_dat_clean %>%
+  select(q5) %>%
+  separate_rows(q5)%>%
+  count(q5)
+
+kable(q5, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:40px;">
+</div>
+
+#### Additional responses to Question 5
+
+```{r q5_6 text, echo = F}
+
+q5_6 <- survey_dat_clean %>%
+  count(q5_6_text)%>%
+  select(-n)
+
+kable(q5_6)%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+ 
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 6. Did you learn anything while volunteering with CCFRP that you found useful?
+
+**1 = "I learned more about the wide range of fish species caught in this area"**
+
+**2 = "I learned what a marine protected area is"**
+
+**3 = "I learned where I am not allowed to go fishing"**
+
+**4 = "I learned how to identify nearhore fish species"**
+
+**5 = "I learned how fishing data can be used in fisheries management"**
+
+**6 = "I learned about techniques to descend groundfish"**
+
+**7 = "I learned how MPAs can be used to manage fisheries"**
+
+**8 = "I did not learn anything"**
+
+**9 = "Other (specify)"**
+
+```{r q6, echo = F}
+
+q6 <- survey_dat_clean %>%
+  select(q6) %>%
+  separate_rows(q6)%>%
+  count(q6)
+
+kable(q6, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+
+<div style="margin-bottom:40px;">
+</div>
+
+#### Additional responses to Question 6
+
+```{r q6_9 text, echo = F}
+
+q6_9 <- survey_dat_clean %>%
+  count(q6_9_text)%>%
+  select(-n)
+
+kable(q6_9)%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+ 
+```
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 7. I used the following resources to learn about the data collected by CCFRP:
+
+**1 = "CCFRP data briefings at the end of a trip"**
+
+**2 = "Reading the annual volunteer newsletter"**
+
+**3 = "Attending Volunteer Appreciation and Data Workshops if/when offered"**
+
+**4 = "I am not interested in learning about the data that CCFRP collects"**
+
+```{r q7, echo = F}
+
+q7 <- survey_dat_clean %>%
+  select(q7) %>%
+  separate_rows(q7)%>%
+  count(q7)
+
+kable(q7, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 8. I have told my recreational fishing buddies about CCFRP.
+
+**1 = "Yes"**
+
+**2 = "No"**
+
+```{r q8, echo = F}
+
+q8 <- survey_dat_clean %>%
+  count(q8)
+
+kable(q8, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+[Go to top](#top)
+
+## Section 2) Marine Protected Areas
+
+### 9. **Before** volunteering with CCFRP, what was your general opinion of the creation of MPAs in California? My general opinion or MPA creation was ...
+
+**1 = "Positive"**
+
+**2 = "Somewhat positive"**
+
+**3 = "Neither positive nor negative"**
+
+**4 = "Somewhat negative"**
+
+**5 = "Negative"**
+
+**6 = "No Opinion"**
+
+```{r q9, echo = F}
+
+q9 <- survey_dat_clean %>%
+  count(q9)
+
+kable(q9, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 10. **Before** volunteering with CCFRP, did you believe the creation of MPAs would affect the size/abundance of groundfish inside MPAs?
+
+**1 = "Yes, I believed there would be an *increase* in the size of groundfish inside MPAs"**
+
+**2 = "Yes, I believed there would be an *increase* in the abundance of groundfish inside MPAs"**
+
+**3 = "Yes, I believed there would be a *decrease* in the size of groundfish inside MPAs"**
+
+**4 = "Yes, I believed there would be a *decrease* in the abundance of groundfish inside MPAs"**
+
+**5 = "No, I believed there would be *no effect* on size of groundfish inside MPAs"**
+
+**6 = "No, I believed there would be *no effect* on the abundance of groundfish inside MPAs"**
+
+**7 = "I don’t know"**
+
+**8 = "No opinion"**
+
+```{r q10, echo=F}
+
+
+q10 <- survey_dat_clean %>%
+  select(q10) %>%
+  separate_rows(q10)%>%
+  count(q10)
+
+kable(q10, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 11. **After** volunteering with CCFRP, what was your general opinion of the creation of MPAs in California? My general opinion or MPA creation was ...
+
+**1 = "Positive"**
+
+**2 = "Somewhat positive"**
+
+**3 = "Neither positive nor negative"**
+
+**4 = "Somewhat negative"**
+
+**5 = "Negative"**
+
+**6 = "No Opinion"**
+
+```{r q11, echo = F}
+
+q11 <- survey_dat_clean %>%
+  count(q11)
+
+kable(q11, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 12. **After** volunteering with CCFRP, did you believe the creation of MPAs would affect the size/abundance of groundfish inside MPAs?
+
+**1 = "Yes, I believed there would be an *increase* in the size of groundfish inside MPAs"**
+
+**2 = "Yes, I believed there would be an *increase* in the abundance of groundfish inside MPAs"**
+
+**3 = "Yes, I believed there would be a *decrease* in the size of groundfish inside MPAs"**
+
+**4 = "Yes, I believed there would be a *decrease* in the abundance of groundfish inside MPAs"**
+
+**5 = "No, I believed there would be *no effect* on size of groundfish inside MPAs"**
+
+**6 = "No, I believed there would be *no effect* on the abundance of groundfish inside MPAs"**
+
+**7 = "I don’t know"**
+
+**8 = "No opinion"**
+
+```{r q12, echo=F}
+
+
+q12 <- survey_dat_clean %>%
+  select(q12) %>%
+  separate_rows(q12)%>%
+  count(q12)
+
+kable(q12, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 13. If you believe that California MPA creation affected **groundfish abundance and/or size**, what aspect(s) of MPAs do you believe caused these changes?
+
+**1 = "Location of MPAs"**
+
+**2 = "Size of MPAs"**
+
+**3 = "Enforcement of MPA restrictions"**
+
+**4 = "Planning of MPAs as a network"**
+
+**5 = "MPA protection of a portion of fish populations"**
+
+**6 = "Voluntary compliance with restrictions"**
+
+**7 = "Other"**
+
+**8 = "N/A, I do not believe there is an effect"**
+
+```{r q13, echo=F}
+
+
+q13 <- survey_dat_clean %>%
+  select(q13) %>%
+  separate_rows(q13)%>%
+  count(q13)
+
+kable(q13, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 14. In your **opinion**, what is the purpose of a Marine Protected Area? 
+
+**1 = "To set aside areas of ocean to conserve, restore, and understand natural biodiversity and ecology of the area"**
+
+**2 = "To provide people the opportunity to experience these areas of the ocean now and into the future"**
+
+**3 = "To restrict industrial uses (seabed mining, oil and gas exploration or drilling, windmill or turbine construction, minerals extraction)"**
+
+**4 = "To prevent overfishing/ overuse/ degradation"**
+
+**5 = "MPAs do not have a purpose"**
+
+**6 = "I have no opinion on the purpose of MPAs"**
+
+```{r q14, echo=F}
+
+
+q14 <- survey_dat_clean %>%
+  select(q14) %>%
+  separate_rows(q14)%>%
+  count(q14)
+
+kable(q14, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 15. Have you ever fished in a Marine Protected Area before it was protected **OR** while volunteering with CCFRP? (If no, skip to section 3)
+
+**1 = "Yes"**
+
+**2 = "No"**
+
+```{r q15, echo = F}
+
+q15 <- survey_dat_clean %>%
+  count(q15)
+
+kable(q15, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 16. Think about this when answering a-c: Have you experienced a difference in fishing in an MPA versus outside of an MPA? 
+
+### a.  I catch more fish when fishing inside...
+
+**1 = "MPAs"**
+
+**2 = "Areas open to fishing"**
+
+**3 = "I don’t know"**
+
+**4 = "No difference"**
+
+```{r q16, echo = F}
+
+q16 <- survey_dat_clean %>%
+  count(q16)
+
+kable(q16, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+### b. I catch a greater diversity of fish species when fishing inside...
+
+**1 = "MPAs"**
+
+**2 = "Areas open to fishing"**
+
+**3 = "I don’t know"**
+
+**4 = "No difference"**
+
+```{r q17, echo = F}
+
+q17 <- survey_dat_clean %>%
+  count(q17)
+
+kable(q17, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+### c. I catch larger fish when I fish inside...
+
+**1 = "MPAs"**
+
+**2 = "Areas open to fishing"**
+
+**3 = "I don’t know"**
+
+**4 = "No difference"**
+
+```{r q18, echo = F}
+
+q18 <- survey_dat_clean %>%
+  count(q18)
+
+kable(q18, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 17. What is the **primary** reason you enjoy fishing with CCFRP in an MPA: 
+
+**1 = "I have no preference for CCFRP fishing sites (MPA or reference)"**
+
+**2 = "To catch a large fish"**
+
+**3 = "To catch a lot of fish"**
+
+**4 = "To catch a lot of species"**
+
+**5 = "To collect scientific fishing data"**
+
+```{r q19, echo = F}
+
+q19 <- survey_dat_clean %>%
+  count(q19)
+
+kable(q19, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+### 18. Hypothetically, how much would you be willing to pay for one day of catch and release fishing inside an MPA while **NOT** participating on a CCFRP trip?
+
+**1 = "\$0"**
+
+**2 = "\$1 - $20"**
+
+**3 = "\$21 - $50"**
+
+**4 = "\$51 - $100"**
+
+**5= "\$101 - $500"**
+
+**6 = ">$500"**
+
+
+```{r q20, echo = F}
+
+q20 <- survey_dat_clean %>%
+  count(q20)
+
+kable(q20, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+[Go to top](#top)
+
+## Section 3) Natural Resource Conservation
+
+### 19. In general, would you say you are more conservation-minded or less conservation-minded than others in the recreational angling community?
+
+### Compared to the rest of the angling community, I am...
+
+**1 = "More conservation minded"**
+
+**2 = "Similarly conservation minded"**
+
+**3 = "Less conservation minded"**
+
+**4 = "I don’t know"**
+
+```{r q22, echo = F}
+
+q22 <- survey_dat_clean %>%
+  count(q22)
+
+kable(q22, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 20. Do you participate in activities with conservation-oriented groups (separate from CCFRP)?
+
+**1 = "Yes"**
+
+**2 = "No"**
+
+```{r q23, echo = F}
+
+q23 <- survey_dat_clean %>%
+  count(q23)
+
+kable(q23, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 21. How informed do you consider yourself to be concerning ocean issues in California?
+
+**1 = "Not well"**
+
+**2 = "Somewhat"**
+
+**3 = "Well"**
+
+**4 = "Very Well"**
+
+**5 = "Unsure"**
+
+```{r q24, echo = F}
+
+q24 <- survey_dat_clean %>%
+  count(q24)
+
+kable(q24, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 22. In what ways do you currently obtain information about ocean related issues? Select all that apply.
+
+**1 = "CCFRP related events (Volunteer Appreciation/ Data Workshops)"**
+
+**2 = "Newspaper"**
+
+**3 = "Magazine"**
+
+**4 = "Family/Friends"**
+
+**5 = "Radio"**
+
+**6 = "Internet"**
+
+**7 = "Social Media"**
+
+**8 = "Television"**
+
+**9 = "Other"**
+
+**10 = "I have not sought out information on ocean related issues"**
+
+```{r q25, echo=F}
+
+
+q25 <- survey_dat_clean %>%
+  select(q25) %>%
+  separate_rows(q25)%>%
+  count(q25)
+
+kable(q25, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:40px;">
+</div>
+
+#### Additional responses to Question 22
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 23. In your opinion, how well are California groundfish stocks managed? 
+
+### I believe California groundfish stocks are:
+
+**1 = "Very well managed"**
+
+**2 = "Well managed"**
+
+**3 = "Adequately managed"**
+
+**4 = "Poorly managed"**
+
+**5 = "Very poorly managed"**
+
+**6 = "I don’t believe they are managed at all"**
+
+**7 = "I don’t know"**
+
+```{r q26, echo = F}
+
+q26 <- survey_dat_clean %>%
+  count(q26)
+
+kable(q26, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 24. Please rank the following types of fishing gear or fishing practices(from 1 to 8) as having the greatest impact on the degradation of the marine environment or reduction in fish stocks. (1 is least impact and 8 is greatest impact). 
+
+Traps or pots	
+```{r q27_1, echo = F}
+
+q27_1 <- survey_dat_clean %>%
+  count(q27_1)
+
+kable(q27_1, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Hook and line, recreational	
+
+
+
+```{r q27_2, echo = F}
+
+q27_2 <- survey_dat_clean %>%
+  count(q27_2)
+
+kable(q27_2, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Bottom trawling	
+```{r q27_3, echo = F}
+
+q27_3 <- survey_dat_clean %>%
+  count(q27_3)
+
+kable(q27_3, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Longline
+```{r q27_4, echo = F}
+
+q27_4 <- survey_dat_clean %>%
+  count(q27_4)
+
+kable(q27_4, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Gill nets
+```{r q27_5, echo = F}
+
+q27_5 <- survey_dat_clean %>%
+  count(q27_5)
+
+kable(q27_5, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Midwater trawling
+```{r q27_6, echo = F}
+
+q27_6 <- survey_dat_clean %>%
+  count(q27_6)
+
+kable(q27_6, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Hook and line, commercial
+```{r q27_7, echo = F}
+
+q27_7 <- survey_dat_clean %>%
+  count(q27_7)
+
+kable(q27_7, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Spearfishing
+```{r q27_8, echo = F}
+
+q27_8 <- survey_dat_clean %>%
+  count(q27_8)
+
+kable(q27_8, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 25. This question consists of a chart that queries you on your opinion of potential ocean issues. Statements are rated 1-7. An answer of ‘1’ indicates that you strongly disagree, ‘4’ indicates no opinion, and ‘7’ indicates you strongly agree with the statement.
+
+### Please indicate whether you think any of the following is a threat to California’s marine environment. Please circle ONE number for each.
+
+Water Pollution
+```{r q28_1, echo = F}
+
+q28_1 <- survey_dat_clean %>%
+  count(q28_1)
+
+kable(q28_1, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+
+Marine Debris
+
+```{r q28_2, echo = F}
+
+q28_2 <- survey_dat_clean %>%
+  count(q28_2)
+
+kable(q28_2, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Loss of Marine Biodiversity
+
+```{r q28_3, echo = F}
+
+q28_3 <- survey_dat_clean %>%
+  count(q28_3)
+
+kable(q28_3, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Overfishing
+
+```{r q28_4, echo = F}
+
+q28_4 <- survey_dat_clean %>%
+  count(q28_4)
+
+kable(q28_4, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Invasive/Exotic Species
+
+```{r q28_5, echo = F}
+
+q28_5 <- survey_dat_clean %>%
+  count(q28_5)
+
+kable(q28_5, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Rising Sea Temperatures
+
+```{r q28_6, echo = F}
+
+q28_6 <- survey_dat_clean %>%
+  count(q28_6)
+
+kable(q28_6, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Oceano Acidification and Hypoxia
+
+```{r q28_7, echo = F}
+
+q28_7 <- survey_dat_clean %>%
+  count(q28_7)
+
+kable(q28_7, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+Wave energy/Power development
+
+```{r q28_8, echo = F}
+
+q28_8 <- survey_dat_clean %>%
+  count(q28_8)
+
+kable(q28_8, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+
+Oil/gas exploitation or transport
+
+```{r q28_9, echo = F}
+
+q28_9 <- survey_dat_clean %>%
+  count(q28_9)
+
+kable(q28_9, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 26. How interconnected are you with nature? (1 - 7, where 1 is completely separated and 7 is completely interconnected)
+
+```{r q39, echo = F}
+
+q39 <- survey_dat_clean %>%
+  count(q39)
+
+kable(q39, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+[Go to top](#top)
+
+## Section 4) Basic Demographics
+
+### 27. What is the zip code of your primary residence?
+
+```{r q30, echo = F}
+
+q30 <- survey_dat_clean %>%
+  count(q30)
+
+kable(q30, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 28. I identify as
+
+**1 = "Male"**
+
+**2 = "Female"**
+
+**3 = "Non-binary"**
+
+**4 = "Prefer not to state"**
+
+**5 = "Other: (specify)"**
+
+
+```{r q31, echo = F}
+
+q31 <- survey_dat_clean %>%
+  count(q31)
+
+kable(q31, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:40px;">
+</div>
+
+#### Additional responses to Question 22
+
+```{r q31_5 text, echo = F}
+
+q31_5 <- survey_dat_clean %>%
+  count(q31_5_text)%>%
+  select(-n)
+
+kable(q31_5)%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+ 
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 29. What is your age?
+
+**1 = "18-24"**
+
+**2 = "25-34"**
+
+**3 = "35-44"**
+
+**4 = "45-54"**
+
+**5 = "55-64"**
+
+**6 = "65 years and older"**
+
+
+```{r q32, echo = F}
+
+q32 <- survey_dat_clean %>%
+  count(q32)
+
+kable(q32, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 30. What is the highest level of education you have completed?
+
+**1 = "Less than high school degree"**
+
+**2 = "High school degree or equivalent (e.g., GED)"**
+
+**3 = "Associate degree or completion of technical or professional school"**
+
+**4 = "Some college but no degree"**
+
+**5 = "Bachelor degree"**
+
+**6 = "Graduate degree (e.g., Master degree. PhD, JD, MD, etc.)"**
+
+```{r q33, echo = F}
+
+q33 <- survey_dat_clean %>%
+  count(q33)
+
+kable(q33, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+### 31. Which of the following categories best describes your household’s total annual income before taxes in 2020? 
+
+**1 = "Less than $25,000"**
+
+**2 = "\$25,000 - $34,999"**
+
+**3 = "\$35,000 - $49,999"**
+
+**4 = "\$50,000 - $74,999"**
+
+**5 = "\$75,000 - $99,999"**
+
+**6 = "\$100,000 - $149,999"**
+
+**7 = "\$150,000 - $199,999"**
+
+**8 = "\$200,000 or more"**
+
+**9 = "Decline to state"**
+
+```{r q34, echo = F}
+
+q34 <- survey_dat_clean %>%
+  count(q34)
+
+kable(q34, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+### 32. Have you or anyone you know ever worked in marine resource management at the local, state, federal, or academic level. Select all that apply. (e.g., CA Department of Fish and Wildlife or NOAA)
+
+**1 = "Yes, self"**
+
+**2 = "Yes, family"**
+
+**3 = "Yes, friend"**
+
+**4 = "No"**
+
+
+
+```{r q35, echo = F}
+
+q35 <- survey_dat_clean %>%
+  select(q35) %>%
+  separate_rows(q35)%>%
+  count(q35)
+
+kable(q35, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+*NOTE: this was a select all question. Multiple answers were separated and counted.*
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 33. Have you ever worked in the recreational fishing industry? (e.g., a captain, boat crew, bait or tackle salesperson, etc.)
+
+**1 = "Yes"**
+
+**2 = "No"**
+
+```{r q36, echo = F}
+
+q36 <- survey_dat_clean %>%
+  count(q36)
+
+kable(q36, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+
+### 34. Have you ever worked in the commercial fishing industry? (e.g., a fisherman, captain, boat crew, buyer, etc.)
+
+**1 = "Yes"**
+
+**2 = "No"**
+
+```{r q37, echo = F}
+
+q37 <- survey_dat_clean %>%
+  count(q37)
+
+kable(q37, table.attr = "style='width:30%;'")%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+
+```
+
+<div style="margin-bottom:80px;">
+</div>
+
+### 35. Additional space is provided below for any additional comments or concerns regarding this survey.
+
+
+```{r q38 text, echo = F}
+
+q38 <- survey_dat_clean %>%
+  count(q38)%>%
+  select(-n)
+
+kable(q38)%>%
+  kable_styling(bootstrap_options = "bordered",
+                position = "left")
+ 
+```
+
+<div style="margin-bottom:100px;">
+</div>
+
+[Go to top](#top)
+
+# Preliminary Figures for Snapshot Analysis
+
+All graphs are set up the same way - Standard ggplot grey color, larger font size etc. These are the graphs that made it into the google doc/snapshot analysis.
+
+**FONT SIZE**
+
+To change the size of the percentages above bars, change the `size` argument in `geom_text()`. To change the size of the axis title or text, change the `size` argument inside of the `theme()` function --this should be the last function on the end of each ggplot.
+
+**PLOT COLOR**
+
+-For bars that are all one color: include a `fill` and `color` argument inside of `geom_col()`, but OUTSIDE of the aestheic function `aes()`. Assign a fill and color using hexidecimal ggplot colors. Examples are '#000666', #CC6600' which have to be in quotes. You can find all the colors here: http://www.cookbook-r.com/Graphs/Colors_(ggplot2)/. 
+
+-For bars that are different colors, assign the colors manually. Add a `fill` and `color` argument INSIDE of `aes()` inside of `geom_col()`. Then add two more functions to ggplot: `scale_fill_manual()` and `scale_color_manual()` with the designated colors inside.
+
+**ORIENTATION**
+
+To turn the bars horizonally, add the function `coord_flip()` to ggplot
+
+<div style="margin-bottom:50px;">
+</div>
+
+
+
+
+### **MARINE PROTECTED AREAS: QUESTIONS 9 & 11**
+
+Before and after volunteering with CCFRP, what was your general opinion of the creation of MPAs in California?
+
+```{r beforeafter setup}
+beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
+
+ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q9, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  #, aes(fill = Q9, color = Q9)
+  #scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  #scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nBefore Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss11 <- survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q11))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q11, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  # , aes(fill = q11, color = q11)
+  # scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  # scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nAfter Volunteering with CCFRP', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        #legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+```
+
+<a id="beforeafteranchor"></a>
+
+```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+
+ss9/ss11
+
+```
+
+[Time Volunteered Breakdown](#beforeafter_tv)
+
+[Region Breakdown](#beforeafter_region)
+
+
+
+### **GENERAL: QUESTIONS 16 a-c**
+
+Have you experienced a difference in fishing in an MPA versus outside of an MPA?
+
+* I catch more fish when fishing inside...
+
+* I catch a greater diversity of fish species when fishing inside...
+
+* I catch larger fish when I fish inside...
+
+```{r fishingarea setup}
+
+## answer option list
+fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
+
+ss16 <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss17 <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss18 <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+```
+
+<a id="fishingareaanchor"></a>
+
+```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center"}
+
+ss16/ss17/ss18
+
+```
+
+[Time Volunteered Breakdown](#fishingarea_tv)
+
+[Region Breakdown](#fishingarea_region)
+
+### **QUESTION 18**
+
+Hypothetically, how much would you be willing to pay for one day of catch and release fishing inside an MPA while not participating on a CCFRP trip?
+
+```{r mpamoney setup}
+
+money <- c('$0', '$1 - $20', '$21 - $50', '$51 - 100', '$101 - $500', '>$500')
+
+ss20 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q20))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q20, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = money) +
+  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+
+```
+
+```{r mpamoney plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss20
+
+```
+
+
+
+
+### **NATURAL RESOURCE CONSERVATION: QUESTION 23**
+
+In your opinion, how well are California groundfish stocks managed?
+
+```{r management setup}
+
+managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
+
+ss26 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+<a id="managementanchor"></a>
+
+```{r management plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss26
+
+```
+
+
+[Time Volunteered Breakdown](#management_tv)
+
+[Region Breakdown](#management_region)
+
+
+### **BASIC DEMOGRAPHICS: IDENTITY**
+
+```{r identity setup}
+
+ss31 <- survey_dat_clean %>% select(q31) %>% drop_na() %>% count(q31 = factor(q31))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q31, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete(labels = c('Male', 'Female', 'Non-binary', 'Prefer not to state', 'Other')) +
+  labs(x = '\nGender Identity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r identity plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss31
+
+```
+
+
+### **BASIC DEMOGRAPHICS: AGE**
+
+```{r age setup}
+
+ss32 <- survey_dat_clean %>% select(q32) %>% drop_na() %>% count(q32 = factor(q32))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q32, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = c('18-24', '25-34', '35-44','45-54','55-64','65 and up')) +
+  labs(x = '\nAge', y = '\nPercent') +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r age plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss32
+
+```
+
+### **BASIC DEMOGRAPHICS: EDUCATION**
+
+```{r education setup}
+
+ss33 <- survey_dat_clean %>% select(q33) %>% drop_na() %>% count(q33 = factor(q33))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q33, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,60)) +
+  scale_x_discrete(labels = c('Less than \nhigh school degree', 'High school \ndegree', 'Associates degree \nor Tech school', 'Some college', 'College degree', 'Graduate degree')) +
+  labs(x = '\nEducation', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r education plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss33
+
+```
+
+### **BASIC DEMOGRAPHICS: SALARY**
+
+```{r salary setup}
+
+ss34 <- survey_dat_clean %>% select(q34) %>% drop_na() %>% count(q34 = factor(q34))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q34, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,25)) +
+  scale_x_discrete(labels = c('<$25k', '$25-\n$35k', '$35-\n$50k', '$50-\n$75k', '$75-\n$100k', '$100-\n$150k', '$150-\n$200k', '>$200k', 'Decline \nto State')) +
+  labs(x = '\nIncome', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r salary plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss34
+
+```
+
+```{r sample size check, echo = F}
+
+
+# ggsave(here("Images","ss9_11.png"), plot = ss9and11 , width = 8, height = 6, dpi = 1000)
+
+# ss9n <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))
+# sum(ss9n$n) ##228
+
+# ss11n <- survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q11))
+# sum(ss11n$n) ##227
+
+# ss16n <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q16))
+# sum(ss16n$n) ##159
+ 
+# ss17n <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q17))
+# sum(ss17n$n) ##159
+ 
+# ss18n <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q18))
+# sum(ss18n$n) ## 159
+
+# ss20n <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q20))
+# sum(ss20n$n) ##221
+
+# ss26n <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))
+# sum(ss26n$n) ## 228 
+
+# ss31n <- survey_dat_clean %>% select(q31) %>% drop_na() %>% count(q31 = factor(q31))
+# sum(ss31n$n) ## 227
+
+# ss32n <- survey_dat_clean %>% select(q32) %>% drop_na() %>% count(q32 = factor(q32))
+# sum(ss32n$n) ## 226
+
+# ss33n <- survey_dat_clean %>% select(q33) %>% drop_na() %>% count(q33 = factor(q33))
+# sum(ss33n$n) ## 225
+
+# ss34n <- survey_dat_clean %>% select(q34) %>% drop_na() %>% count(q34 = factor(q34))
+# sum(ss34n$n) ## 223
+```
+
+
+<div style="margin-bottom:80px;">
+</div>
+
+[Go to top](#top)
+
+# In-Depth Plots and Analyses
+
+**GOALS/LAB MEETING NOTES (2021-09)**:
+
+* Should we break down some of these by demographic information?
+
+  * Education level would be interesting
+  
+  * Interconnectedness with nature (not really demographic, but still interesting)
+
+* Breakdown by institution... or is that going to be biased because CP and MLML have been running CCFRP for longer? Maybe table this until speaking w the group again.
+
+* Breakdown by length of volunteer time? Easy enough, subtract year column from 2021 and use those numbers as categories. Should each year be a category, or should we bin by number of years volunteered? `1-2`, `3-4`, `5-6`, `7-8`, `9-10`, `>10`?
+
+* Alternative ways to visualize the data
+
+## Data Prep for Vis
+
+```{r data prep}
+
+survey_dat_an <- survey_dat_clean %>%
+  select(q1:unanswered)
+  
+
+```
+
+
+## Length of Time Volunteered
+
+The potential hypothesis here being that the longer an angler has volunteered with CCFRP, the more their opinions will have shifted to the 'positive' side of viewing the creation of MPAs (questions 9 & 11), the higher their opinion of the management of California's groundfish stocks (question 23). Potentially that volunteers who have been with CCFRP for many years will also think that fishes are more abundant, diverse, and larger within MPAs than outside of them (the 'skip' code in question 15 in Qualtrics should take care of those who had never fished in an MPA... otherwise this would be a caveat to consider).
+
+### VISUALS
+
+Breaking up some of the questions regarding feelings towards MPAs and conservaion mindedness based on the length of time that anglers have volunteered with CCFRP.
+
+```{r}
+
+time_vol_dat <- survey_dat_an %>%
+  mutate(time_vol = 2021-q1 + 1) %>%
+  select(q1, q9:q12, q16, q17, q18, q26, time_vol) %>%
+  drop_na(time_vol, q11) %>%
+  filter(q1 %in% c(2007:2021)) %>%
+  mutate(time_cat = case_when(
+    time_vol %in% c(1:2) ~ "1-2 years",
+    time_vol %in% c(3:4) ~ "3-4 years",
+    time_vol %in% c(5:6) ~ "5-6 years",
+    time_vol %in% c(7:8) ~ "7-8 years",
+    time_vol %in% c(9:10) ~ "9-10 years",
+    time_vol > 10 ~ ">10 years",
+  ))
+## 5 rows of data did not have a year recorded for question 1
+## 1 row did not have any 'after' information so the data would not be paired
+## 3 rows not in CCFRP time frame based on angler answer (1999, 2005, 2006)
+
+
+## code to check NA in data
+# time_vol_dat %>%
+#   select(everything())%>%
+#   summarise_all(funs(sum(is.na(.))))
+
+```
+
+
+
+
+#### Questions 9 & 11 Paired Data:
+
+```{r beforeafter timevol setup}
+tv9 <- time_vol_dat %>% select(q9, time_cat) %>% drop_na() %>% 
+  count(q9 = factor(q9),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q9, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,30)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nBefore Volunteering with CCFRP', y = 'Percent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+
+
+tv11 <- time_vol_dat %>% select(q11, time_cat) %>% drop_na() %>% 
+  count(q11 = factor(q11),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q11, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,30)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nAfter Volunteering with CCFRP', y = 'Percent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+```
+
+<a id="beforeafter_tv"></a>
+
+```{r beforeafter timevol plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+
+ggarrange(tv9, tv11, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
+
+```
+
+[Go to related snapshot figure](#beforeafteranchor)
+
+*ANALYTICAL NOTE: These two questions are paired. Have to think about how to handle the fact that though the net change seems to be positive after volunteering with CCFRP, we may lose some of the fine scale movements of anglers actually having negative opinions after volunteering with CCFRP. Potential analysis:* **one-way repeated measures ANOVA** 
+
+#### Question 16 a-c: Paired Data
+
+```{r fishingarea tv setup}
+
+tv16 <- time_vol_dat %>% select(q16, time_cat) %>% drop_na() %>% 
+  count(q16 = factor(q16),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+
+tv17 <- time_vol_dat %>% select(q17, time_cat) %>% drop_na() %>% 
+  count(q17 = factor(q17),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+
+tv18 <- time_vol_dat %>% select(q18, time_cat) %>% drop_na() %>% 
+  count(q18 = factor(q18),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+```
+
+<a id="fishingarea_tv"></a>
+
+```{r fishingarea tv plot, fig.height= 8, fig.width= 9, fig.align= "center"}
+
+ggarrange(tv16, tv17, tv18, ncol = 1, nrow = 3, common.legend = TRUE, legend = "right")
+
+```
+
+[Go to related snapshot figure](#fishingareaanchor)
+
+#### Question 23: How well are California groundfish stocks managed?
+
+
+```{r management tv setup}
+managed2 <- c('Very \nWell', 'Well', 'Adequately', 'Poorly', 'Very \nPoorly', 'Not \nManaged', 'Don\'t \nKnow')
+
+tv26 <- time_vol_dat %>% select(q26, time_cat) %>% drop_na() %>% 
+  count(q26 = factor(q26),
+        time_cat = factor(time_cat, levels = c("1-2 years", "3-4 years", "5-6 years", 
+                                               "7-8 years", "9-10 years", ">10 years")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = time_cat))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,15)) +
+  scale_x_discrete(labels = managed2) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent',
+       fill = "Time Volunteered") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        #legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.07, 'npc')))
+
+```
+
+<a id="management_tv"></a>
+
+```{r management tv plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+tv26
+
+```
+
+[Go to related snapshot figure](#managementanchor)
+
+### ANALYSES
+
+
+
+## Region
+
+* South = SIO and UCSB
+
+* Central = CP and MLML
+
+* North = BML and HSU
+
+Potential hypotheses here include that angler feelings toward MPAs and conservation may be different by region. However, big caveat is that there are likely more volunteers from the central region that have fished with CCFRP for a longer period of time. Time volunteered will covary with region. See above for time volunteered visual and analytic work. 
+
+### VISUALS
+
+Breaking up some of the questions regarding feelings towards MPAs and conservaion mindedness based on the region that anglers indicated as their primary interaction with CCFRP.
+
+```{r}
+
+region_dat <- survey_dat_an %>%
+  select(q4, q9:q12, q16, q17, q18, q26) %>%
+  mutate(region = case_when(
+    q4 %in% c(1:2) ~ "North",
+    q4 %in% c(3:4) ~ "Central",
+    q4 %in% c(5:6) ~ "South"
+  )) %>%
+  drop_na(q4) ## 3 people did not indicate which insitutuion they are primarily involved with
+
+## code to check NA in data
+# region_dat %>%
+#   select(everything())%>%
+#   summarise_all(funs(sum(is.na(.))))
+
+```
+
+#### Questions 9 & 11 Paired Data:
+
+```{r beforeafter region setup}
+
+r9 <- region_dat %>% select(q9, region) %>% drop_na() %>% 
+  count(q9 = factor(q9),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q9, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,30)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nBefore Volunteering with CCFRP', y = 'Percent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+
+
+r11 <- region_dat %>% select(q11, region) %>% drop_na() %>% 
+  count(q11 = factor(q11),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q11, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,30)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '\nAfter Volunteering with CCFRP', y = 'Percent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+```
+
+<a id="beforeafter_region"></a>
+
+```{r beforeafter region plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+
+ggarrange(r9, r11, ncol = 1, nrow = 2, common.legend = TRUE, legend = "right")
+
+```
+
+[Go to related snapshot figure](#beforeafteranchor)
+
+#### Question 16 a-c: Paired Data
+
+```{r fishingarea region setup}
+
+r16 <- region_dat %>% select(q16, region) %>% drop_na() %>% 
+  count(q16 = factor(q16),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+
+r17 <- region_dat %>% select(q17, region) %>% drop_na() %>% 
+  count(q17 = factor(q17),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+
+r18 <- region_dat %>% select(q18, region) %>% drop_na() %>% 
+  count(q18 = factor(q18),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.08, 'npc')))
+  
+```
+
+<a id="fishingarea_region"></a>
+
+```{r fishingarea region plot, fig.height= 8, fig.width= 9, fig.align= "center"}
+
+ggarrange(r16, r17, r18, ncol = 1, nrow = 3, common.legend = TRUE, legend = "right")
+
+```
+
+
+[Go to related snapshot figure](#fishingareaanchor)
+
+#### Question 23: How well are California groundfish stocks managed?
+
+
+```{r management region setup}
+
+
+r26 <- region_dat %>% select(q26, region) %>% drop_na() %>% 
+  count(q26 = factor(q26),
+        region = factor(region, levels = c("North", "Central", "South")))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = position_dodge2(preserve = "single"), aes(fill = region))+
+  scale_fill_npg()+
+  scale_y_continuous(limits = c(0,20)) +
+  scale_x_discrete(labels = managed2) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent',
+       fill = "Region") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        #legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+  coord_flex_cart(bottom=brackets_horizontal(length=unit(0.07, 'npc')))
+
+```
+
+<a id="management_region"></a>
+
+```{r management region plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+r26
+
+```
+
+[Go to related snapshot figure](#managementanchor)
+
+### ANALYSES
+
+
+
+
