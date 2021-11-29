@@ -32,6 +32,7 @@ library(patchwork)    ## for combining plots
 library(ggsci)        ## for color mixer
 library(lemon)        ## for brackets
 library(ggpubr)       ## for combining plots & common legend
+library(cowplot)      ## plotting images on graph
 
 ```
 
@@ -79,6 +80,7 @@ survey_dat_clean <- survey_dat_clean %>%
 
 ```
 
+table(q39)
 
 [Go to top](#top)
 
@@ -1827,22 +1829,22 @@ ss17
 
 ### **QUESTION 19**
 
-```{r moreless cons setup}
+```{r}
 
-moreless <- c("More", "Less", "Similar", "I don\'t know")
-## question 19 is q22
+prime_reason <- c("No preference \nfor MPA", "Larger Fish", "More Fish", "More Species", "Collect Scientific \nFishing Data")
+## question 17 is q19
 
-ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q22))%>% 
+ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q19))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
-  ggplot(aes(x = q22, y = pct, label = paste0(pct, "%")))+
+  ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = moreless) +
-  labs(x = '\nAre you more or less conservation-minded than others?', y = 'Percent') +
+  scale_x_discrete(labels = prime_reason) +
+  labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -1852,122 +1854,89 @@ ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q2
 ```
 
 
-```{r moreless cons plot}
 
-ss19
+```{r primary reason plot}
+
+ss17
 
 
 ```
 
 
-### **QUESTION 20**
+## Question 21
 
-```{r conservation group setup}
+```{r}
 
+inform = c("Not well", "Somewhat", "Well", "Very Well", "Unsure")
 
-## question 20 is q23
-
-ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q23))%>% 
+ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q24))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
-  ggplot(aes(x = q23, y = pct, label = paste0(pct, "%")))+
+  ggplot(aes(x = q24, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,45)) +
+  scale_x_discrete(labels = inform) +
+  labs(x = 'How informed do you consider yourself to be concerning ocean issues in Califronia?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+```
+
+```{r primary reason plot}
+
+ss21
+
+
+```
+
+## Question 26
+
+
+```{r}
+
+
+f = (survey_dat_clean$q39)
+survey_dat_clean$q39 = factor(survey_dat_clean$q39, levels = c(1, 2, 3, 4, 5, 6, 7))
+
+
+ss26 <- survey_dat_clean %>% select(q39) %>% 
+  drop_na() %>% 
+  count(q39 = factor(q39), drop = FALSE)%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 1), drop = FALSE)%>%
+  mutate(q39=factor(q39))%>%
+  ggplot(aes(x = q39, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = yesno) +
-  labs(x = '\nDo you participate with other conservation-oriented groups?', y = 'Percent') +
+ scale_x_discrete(drop = FALSE, labels = c("B", "C", "D", "E", "F", "G")) +
+  labs(x = 'How interconnected are you with nature?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
-```
-
-```{r conservation group plot}
-
-ss20
-
-
+ss26.1 = ggdraw(ss26) +
+  draw_image("vendiagram.png", scale = .5, y = .3)
 ```
 
 
-### **QUESTION 10 & 12**
+```{r primary reason plot}
 
-This is a 'select all that apply' questions
+ss26.1
 
-```{r beforeafter groundfish q10}
-
-ss10_dat <- survey_dat_clean %>%
-  select(q10) %>%
-  separate_rows(q10)%>%
-  count(q10) %>%
-  mutate(pct = n/length(survey_dat_clean$q10)*100,
-         pct = round(pct, digits = 1))
-
-length(survey_dat_clean$q10)
-
-beforeafter_groundfish <- c("Increase \nSize", "Increase \nAbundance", "Decrease \nSize",
-                            "Decrease \nAbundance", "No Effect \nSize",
-                            "No Effect \nAbundance", "I don\'t know", "No Opinion")
-
-ba_groundfish_rev <- c("No Opinion", "I don\'t know", "No Effect \nAbundance", "No Effect \nSize", "Decrease \nAbundance", "Decrease \nSize", "Increase \nAbundance","Increase \nSize")
-
-
-ss10 <- survey_dat_clean %>% 
-  select(q10) %>% 
-  drop_na() %>%
-  separate_rows(q10) %>% 
-  count(q10 = factor(q10))%>% 
-  mutate(pct = n/length(survey_dat_clean$q10)*100,
-         pct = round(pct, digits = 1))%>%
-  ggplot(aes(x = q10, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
-  geom_text(position = position_dodge(width = 0.9),
-            vjust = -0.5,
-            size = 4)+
-  scale_y_continuous(limits = c(0,90)) +
-  scale_x_discrete(labels = beforeafter_groundfish) +
-  #coord_flip()+
-  labs(x = '\nDo MPAs affect size/abundance of groundfish - Before Volunteering?', y = 'Percent') +
-  theme_bw() + 
-  theme(panel.grid = element_blank(),
-        legend.position = "none", 
-        axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
 
 ```
-
-
-```{r beforeafter groundfish q12}
-
-ss12 <- survey_dat_clean %>% 
-  select(q12) %>% 
-  drop_na() %>%
-  separate_rows(q12) %>% 
-  count(q12 = factor(q12))%>% 
-  mutate(pct = n/length(survey_dat_clean$q12)*100,
-         pct = round(pct, digits = 1))%>%
-  ggplot(aes(x = q12, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
-  geom_text(position = position_dodge(width = 0.9),
-            vjust = 0.0,
-            hjust = -0.6,
-            size = 4)+
-  scale_y_continuous(limits = c(0,100)) +
-  scale_x_discrete(limits= rev, labels = ba_groundfish_rev) +
-  coord_flip() + 
-  labs(x = '\nDo MPAs affect groundifhs size/abundance \n After Volunteering?\n', y = 'Percent') +
-  theme_bw() + 
-  theme(panel.grid = element_blank(),
-        legend.position = "none", 
-        axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
-
-```
-
 <div style="margin-bottom:80px;">
 </div>
 
