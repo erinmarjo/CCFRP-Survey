@@ -1442,7 +1442,7 @@ Have you experienced a difference in fishing in an MPA versus outside of an MPA?
 ## answer option list
 fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
 
-ss16 <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q16))%>% 
+ss16a <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q16))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
@@ -1459,7 +1459,7 @@ ss16 <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q1
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
-ss17 <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q17))%>% 
+ss16b <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q17))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
@@ -1476,7 +1476,7 @@ ss17 <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q1
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
-ss18 <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q18))%>% 
+ss16c <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q18))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
@@ -1498,7 +1498,7 @@ ss18 <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q1
 
 ```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center"}
 
-ss16/ss17/ss18
+ss16a/ss16b/ss16c
 
 ```
 
@@ -1514,7 +1514,7 @@ Hypothetically, how much would you be willing to pay for one day of catch and re
 
 money <- c('$0', '$1 - $20', '$21 - $50', '$51 - 100', '$101 - $500', '>$500')
 
-ss20 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q20))%>% 
+ss18 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q20))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q20, y = pct, label = paste0(pct, "%")))+
@@ -1537,7 +1537,7 @@ ss20 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q2
 
 ```{r mpamoney plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss20
+ss18
 
 ```
 
@@ -1549,10 +1549,10 @@ ss20
 In your opinion, how well are California groundfish stocks managed?
 
 ```{r management setup}
-
+## question 23 is q26
 managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
 
-ss26 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
+ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
@@ -1575,7 +1575,7 @@ ss26 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q2
 
 ```{r management plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss26
+ss23
 
 ```
 
@@ -1589,7 +1589,8 @@ ss26
 
 ```{r identity setup}
 
-ss31 <- survey_dat_clean %>% select(q31) %>% drop_na() %>% count(q31 = factor(q31))%>% 
+## question 28 is q31
+ss28 <- survey_dat_clean %>% select(q31) %>% drop_na() %>% count(q31 = factor(q31))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q31, y = pct, label = paste0(pct, "%")))+
@@ -1610,7 +1611,7 @@ ss31 <- survey_dat_clean %>% select(q31) %>% drop_na() %>% count(q31 = factor(q3
 
 ```{r identity plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss31
+ss28
 
 ```
 
@@ -1618,8 +1619,8 @@ ss31
 ### **BASIC DEMOGRAPHICS: AGE**
 
 ```{r age setup}
-
-ss32 <- survey_dat_clean %>% select(q32) %>% drop_na() %>% count(q32 = factor(q32))%>% 
+## question 29 is q32
+ss29 <- survey_dat_clean %>% select(q32) %>% drop_na() %>% count(q32 = factor(q32))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q32, y = pct, label = paste0(pct, "%")))+
@@ -1640,7 +1641,7 @@ ss32 <- survey_dat_clean %>% select(q32) %>% drop_na() %>% count(q32 = factor(q3
 
 ```{r age plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss32
+ss29
 
 ```
 
@@ -1648,7 +1649,9 @@ ss32
 
 ```{r education setup}
 
-ss33 <- survey_dat_clean %>% select(q33) %>% drop_na() %>% count(q33 = factor(q33))%>% 
+## question 30 is q33
+
+ss30 <- survey_dat_clean %>% select(q33) %>% drop_na() %>% count(q33 = factor(q33))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q33, y = pct, label = paste0(pct, "%")))+
@@ -1669,15 +1672,16 @@ ss33 <- survey_dat_clean %>% select(q33) %>% drop_na() %>% count(q33 = factor(q3
 
 ```{r education plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss33
+ss30
 
 ```
 
 ### **BASIC DEMOGRAPHICS: SALARY**
 
 ```{r salary setup}
+## question 31 is q34
 
-ss34 <- survey_dat_clean %>% select(q34) %>% drop_na() %>% count(q34 = factor(q34))%>% 
+ss31 <- survey_dat_clean %>% select(q34) %>% drop_na() %>% count(q34 = factor(q34))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q34, y = pct, label = paste0(pct, "%")))+
@@ -1698,7 +1702,7 @@ ss34 <- survey_dat_clean %>% select(q34) %>% drop_na() %>% count(q34 = factor(q3
 
 ```{r salary plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
-ss34
+ss31
 
 ```
 
@@ -1741,6 +1745,119 @@ ss34
 # sum(ss34n$n) ## 223
 ```
 
+
+## Additional SnapShot Figures
+
+### **QUESTION 15**
+
+```{r fished mpa setup}
+
+yesno <- c("Yes", "No")
+
+ss15 <- survey_dat_clean %>% select(q15) %>% drop_na() %>% count(q15 = factor(q15))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q15, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = yesno) +
+  labs(x = 'Have You Fished in an MPA?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r fished mpa plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss15
+
+```
+
+
+
+### **QUESTION 17**
+
+**1 = "I have no preference for CCFRP fishing sites (MPA or reference)"**
+
+**2 = "To catch a large fish"**
+
+**3 = "To catch a lot of fish"**
+
+**4 = "To catch a lot of species"**
+
+**5 = "To collect scientific fishing data"**
+
+```{r primary reason setup}
+
+prime_reason <- c("No preference \nfor MPA", "Larger Fish", "More Fish", "More Species", "Collect Scientific \nFishing Data")
+## question 17 is q19
+
+ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q19))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = prime_reason) +
+  labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r primary reason plot}
+
+ss17
+
+
+```
+
+
+### **QUESTION 19**
+
+```{r}
+
+prime_reason <- c("No preference \nfor MPA", "Larger Fish", "More Fish", "More Species", "Collect Scientific \nFishing Data")
+## question 17 is q19
+
+ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q19))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = prime_reason) +
+  labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r primary reason plot}
+
+ss17
+
+
+```
 
 <div style="margin-bottom:80px;">
 </div>
