@@ -1748,7 +1748,7 @@ ss31
 ```
 
 
-## Additional SnapShot Figures
+# Additional SnapShot Figures
 
 ### **QUESTION 15**
 
@@ -1819,13 +1819,15 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
 
 ```
 
-```{r primary reason plot}
+```{r primary reason plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss17
 
 
 ```
 
+
+### **QUESTION 19**
 
 ```{r moreless cons setup}
 
@@ -1852,7 +1854,7 @@ ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q2
 ```
 
 
-```{r moreless cons plot}
+```{r moreless cons plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss19
 
@@ -1885,7 +1887,7 @@ ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q2
 
 ```
 
-```{r conservation group plot}
+```{r conservation group plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss20
 
@@ -1912,7 +1914,7 @@ ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q2
             size = 4)+
   scale_y_continuous(limits = c(0,45)) +
   scale_x_discrete(labels = inform) +
-  labs(x = 'How informed do you consider yourself to be concerning ocean issues in Califronia?', y = 'Percent') +
+  labs(x = '\nHow informed do you consider yourself to be concerning ocean issues in Califronia?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -1922,7 +1924,7 @@ ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q2
 
 ```
 
-```{r informed plot}
+```{r informed plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss21
 
@@ -1964,7 +1966,7 @@ ss26.1 = ggdraw(ss26) +
 ```
 
 
-```{r interconnected plot}
+```{r interconnected plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 
 ss26.1
@@ -2018,6 +2020,12 @@ ss10 <- survey_dat_clean %>%
 
 ```
 
+```{r q10 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss10
+
+```
+
 
 ```{r beforeafter groundfish q12}
 
@@ -2045,6 +2053,13 @@ ss12 <- survey_dat_clean %>%
         axis.text = element_text(size = 12))
 
 ```
+
+```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss12
+
+```
+
 
 <div style="margin-bottom:80px;">
 </div>
