@@ -1917,9 +1917,16 @@ ss26 <- survey_dat_clean %>% select(q39) %>%
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
+<<<<<<< HEAD
   scale_y_continuous(limits = c(0,75)) +
  scale_x_discrete(drop = FALSE, labels = c("B", "C", "D", "E", "F", "G")) +
   labs(x = 'How interconnected are you with nature?', y = 'Percent') +
+=======
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = beforeafter_groundfish) +
+  #coord_flip()+
+  labs(x = '\nDo MPAs affect size/abundance of groundfish? \nBefore Volunteering', y = 'Percent') +
+>>>>>>> 1ded961e21f1fd55175102f3a284dcecf8ae4695
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -1933,7 +1940,32 @@ ss26.1 = ggdraw(ss26) +
 
 ```{r primary reason plot}
 
+<<<<<<< HEAD
 ss26.1
+=======
+ss12 <- survey_dat_clean %>% 
+  select(q12) %>% 
+  drop_na() %>%
+  separate_rows(q12) %>% 
+  count(q12 = factor(q12))%>% 
+  mutate(pct = n/length(survey_dat_clean$q12)*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q12, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = 0.0,
+            hjust = -0.6,
+            size = 4)+
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete(limits= rev, labels = ba_groundfish_rev) +
+  coord_flip() + 
+  labs(x = '\nDo MPAs affect groundifhs size/abundance? \n After Volunteering\n', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+>>>>>>> 1ded961e21f1fd55175102f3a284dcecf8ae4695
 
 
 ```
