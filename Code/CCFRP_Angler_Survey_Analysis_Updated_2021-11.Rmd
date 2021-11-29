@@ -1827,24 +1827,22 @@ ss17
 ```
 
 
-### **QUESTION 19**
+```{r moreless cons setup}
 
-```{r}
+moreless <- c("More", "Less", "Similar", "I don\'t know")
+## question 19 is q22
 
-prime_reason <- c("No preference \nfor MPA", "Larger Fish", "More Fish", "More Species", "Collect Scientific \nFishing Data")
-## question 17 is q19
-
-ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q19))%>% 
+ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q22))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
-  ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
+  ggplot(aes(x = q22, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
-  scale_x_discrete(labels = prime_reason) +
-  labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
+  scale_x_discrete(labels = moreless) +
+  labs(x = '\nAre you more or less conservation-minded than others?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -1854,18 +1852,53 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
 ```
 
 
+```{r moreless cons plot}
 
-```{r primary reason plot}
+ss19
 
-ss17
+
+```
+
+### **QUESTION 20**
+
+```{r conservation group setup}
+
+
+## question 20 is q23
+
+ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q23))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q23, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = yesno) +
+  labs(x = '\nDo you participate with other conservation-oriented groups?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r conservation group plot}
+
+ss20
 
 
 ```
 
 
-## Question 21
 
-```{r}
+
+
+### **Question 21**
+
+```{r informed setup}
 
 inform = c("Not well", "Somewhat", "Well", "Very Well", "Unsure")
 
@@ -1889,17 +1922,17 @@ ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q2
 
 ```
 
-```{r primary reason plot}
+```{r informed plot}
 
 ss21
 
 
 ```
 
-## Question 26
+### **Question 26**
 
 
-```{r}
+```{r interconnected setup}
 
 
 f = (survey_dat_clean$q39)
@@ -1917,16 +1950,9 @@ ss26 <- survey_dat_clean %>% select(q39) %>%
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
-<<<<<<< HEAD
   scale_y_continuous(limits = c(0,75)) +
  scale_x_discrete(drop = FALSE, labels = c("B", "C", "D", "E", "F", "G")) +
   labs(x = 'How interconnected are you with nature?', y = 'Percent') +
-=======
-  scale_y_continuous(limits = c(0,90)) +
-  scale_x_discrete(labels = beforeafter_groundfish) +
-  #coord_flip()+
-  labs(x = '\nDo MPAs affect size/abundance of groundfish? \nBefore Volunteering', y = 'Percent') +
->>>>>>> 1ded961e21f1fd55175102f3a284dcecf8ae4695
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -1938,11 +1964,63 @@ ss26.1 = ggdraw(ss26) +
 ```
 
 
-```{r primary reason plot}
+```{r interconnected plot}
 
-<<<<<<< HEAD
+
 ss26.1
-=======
+
+
+```
+
+### **QUESTION 10 & 12**
+
+This is a 'select all that apply' questions
+
+```{r beforeafter groundfish q10}
+
+ss10_dat <- survey_dat_clean %>%
+  select(q10) %>%
+  separate_rows(q10)%>%
+  count(q10) %>%
+  mutate(pct = n/length(survey_dat_clean$q10)*100,
+         pct = round(pct, digits = 1))
+
+length(survey_dat_clean$q10)
+
+beforeafter_groundfish <- c("Increase \nSize", "Increase \nAbundance", "Decrease \nSize",
+                            "Decrease \nAbundance", "No Effect \nSize",
+                            "No Effect \nAbundance", "I don\'t know", "No Opinion")
+
+ba_groundfish_rev <- c("No Opinion", "I don\'t know", "No Effect \nAbundance", "No Effect \nSize", "Decrease \nAbundance", "Decrease \nSize", "Increase \nAbundance","Increase \nSize")
+
+
+ss10 <- survey_dat_clean %>% 
+  select(q10) %>% 
+  drop_na() %>%
+  separate_rows(q10) %>% 
+  count(q10 = factor(q10))%>% 
+  mutate(pct = n/length(survey_dat_clean$q10)*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q10, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = beforeafter_groundfish) +
+  #coord_flip()+
+  labs(x = '\nDo MPAs affect size/abundance of groundfish? \nBefore Volunteering', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r beforeafter groundfish q12}
+
 ss12 <- survey_dat_clean %>% 
   select(q12) %>% 
   drop_na() %>%
@@ -1965,10 +2043,9 @@ ss12 <- survey_dat_clean %>%
         legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
->>>>>>> 1ded961e21f1fd55175102f3a284dcecf8ae4695
-
 
 ```
+
 <div style="margin-bottom:80px;">
 </div>
 
