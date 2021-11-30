@@ -17,19 +17,19 @@ Section 1) Angler Involvement
 
 QUESTION 1: one answer, *nominal/ordinal* (?)
 
-QUESTION 2: one answer, *ordinal*
+*done* QUESTION 2: one answer, *ordinal*
 
-QUESTION 3: one answer, *interval*
+*done* QUESTION 3: one answer, *interval*
 
-QUESTION 4: one answer, *nominal*
+*done* QUESTION 4: one answer, *nominal*
 
-QUESTION 5: multiple answers, *nominal*
+*done* QUESTION 5: multiple answers, *nominal*
 
-QUESTION 6: multiple answers, *nominal*
+*done* QUESTION 6: multiple answers, *nominal*
 
-QUESTION 7: multiple answers, *nominal*
+*done* QUESTION 7: multiple answers, *nominal*
 
-QUESTION 8: one answer, yes/no (?) *nominal*
+*done* QUESTION 8: one answer, yes/no (?) *nominal*
 
 
 Section 2) Marine Protected Areas
@@ -42,9 +42,9 @@ done QUESTION 11: one answer, *ordinal*... except 'no opinion'
 
 QUESTION 12: multiple answers, *nominal/ordinal* (?)
 
-QUESTION 13: multiple answers, *nominal*
+*done* QUESTION 13: multiple answers, *nominal*
 
-QUESTION 14: multiple answers, *nominal*
+*done* QUESTION 14: multiple answers, *nominal*
 
 *done* QUESTION 15: one answer, yes/no (?), *nominal*
 
@@ -61,9 +61,9 @@ Section 3) Natural Resource Conservation
 
 *done* QUESTION 20: one answer, yes/no (?), *nominal*
 
-QUESTION 21: one answer, *ordinal*
+*done* QUESTION 21: one answer, *ordinal*
 
-QUESTION 22: multiple answers, *nominal*
+*done* QUESTION 22: multiple answers, *nominal*
 
 *done* QUESTION 23: one answer, *ordinal*
 
@@ -71,7 +71,7 @@ QUESTION 24: rank order impacts, *ordinal*
 
 QUESTION 25: rank order agreement, *ordinal/interval* (likert-scale)
 
-QUESTION 26: one answer, *ordinal*
+*done* QUESTION 26: one answer, *ordinal*
 
 
 Section 4) Basic Demographics

@@ -1436,7 +1436,7 @@ ss3
 
 institution <- c("Humboldt State \nUniversity", "Bodega Marine \nLaboratory",
                  "Moss Landing \nMarine Laboratories", "Cal Poly SLO",
-                 "UC Santa Barbara", "Scripp Institution \nof Oceanography")
+                 "UC Santa Barbara", "Scripps Institution \nof Oceanography")
 
 ss4 <- survey_dat_clean %>% select(q4) %>% drop_na() %>% count(q4 = factor(q4))%>% 
     mutate(pct = n/sum(n)*100,
@@ -1793,7 +1793,7 @@ ss13
 
 ```{r q14 setup}
 
-mpa_purpose <- c("Location", "Size", "Enforcement", "Network", "Fish population \nprotection", "Voluntary \ncompliance", "Other", "I do not \nbelieve there \nis an effect")
+mpa_purpose <- c("Conserve, restore, \nand understand \nnatural biodiversity \nand ecology", "Provide opportunity \nto experience \nthese areas ", "Restrict industrial \nuses", "Prevent overfishing\n/overuse/degredation", "No purpose", "No opinion")
 
 ss14 <- survey_dat_clean %>% 
   select(q14) %>% 
@@ -1801,7 +1801,7 @@ ss14 <- survey_dat_clean %>%
   separate_rows(q14) %>% 
   count(q14 = factor(q14))%>% 
   mutate(pct = n/sum(!is.na(survey_dat_clean$q14))*100,
-         pct = round(pct, digits = 0))%>%
+         pct = round(pct, digits = 1))%>%
   ggplot(aes(x = q14, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge(width = 0.9),
@@ -1814,7 +1814,7 @@ ss14 <- survey_dat_clean %>%
   theme(panel.grid = element_blank(),
         legend.position = "none", 
         axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
+        axis.text = element_text(size = 11))
 
 ```
 
@@ -2109,6 +2109,60 @@ ss21
 
 ### **QUESTION 22**
 
+**1 = "CCFRP related events (Volunteer Appreciation/ Data Workshops)"**
+
+**2 = "Newspaper"**
+
+**3 = "Magazine"**
+
+**4 = "Family/Friends"**
+
+**5 = "Radio"**
+
+**6 = "Internet"**
+
+**7 = "Social Media"**
+
+**8 = "Television"**
+
+**9 = "Other"**
+
+**10 = "I have not sought out information on ocean related issues"**
+
+
+```{r info setup}
+
+## Question 22 is q25
+info <- c("CCFRP \nrelated events", "Newspaper", "Magazine", "Family\n/friends", "Radio", "Internet", "Social \nmedia", "Television", "Other", "I have not \nsought out \ninformation on \nocean-related \nissues")
+
+ss22 <- survey_dat_clean %>% 
+  select(q25) %>% 
+  drop_na() %>%
+  separate_rows(q25) %>% 
+  count(q25 = factor(q25))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q25))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q25, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = info) +
+  labs(x = '\nWhere do you obtain information about ocean-related issues?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 11))
+
+```
+
+```{r info plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss22
+
+```
 
 
 ### **QUESTION 23**
