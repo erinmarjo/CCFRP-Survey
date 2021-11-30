@@ -15,7 +15,7 @@ knitr::opts_chunk$set(echo = TRUE,
 
 Section 1) Angler Involvement
 
-QUESTION 1: one answer, nominal/ordinal/
+QUESTION 1: one answer, *nominal/ordinal* (?)
 
 QUESTION 2: one answer, *ordinal*
 
@@ -46,26 +46,26 @@ QUESTION 13: multiple answers, *nominal*
 
 QUESTION 14: multiple answers, *nominal*
 
-done QUESTION 15: one answer, yes/no (?), *nominal*
+*done* QUESTION 15: one answer, yes/no (?), *nominal*
 
-done QUESTIONS 16 a-c: one answer each, *nominal*
+*done* QUESTIONS 16 a-c: one answer each, *nominal*
 
-done QUESTION 17: one answer, *nominal*
+*done* QUESTION 17: one answer, *nominal*
 
-done QUESTION 18: one answer, *interval*
+*done* QUESTION 18: one answer, *interval*
 
 
 Section 3) Natural Resource Conservation
 
-QUESTION 19: one answer, *nominal*
+*done* QUESTION 19: one answer, *nominal*
 
-QUESTION 20: one answer, yes/no (?), *nominal*
+*done* QUESTION 20: one answer, yes/no (?), *nominal*
 
 QUESTION 21: one answer, *ordinal*
 
 QUESTION 22: multiple answers, *nominal*
 
-done QUESTION 23: one answer, *ordinal*
+*done* QUESTION 23: one answer, *ordinal*
 
 QUESTION 24: rank order impacts, *ordinal*
 
@@ -76,15 +76,15 @@ QUESTION 26: one answer, *ordinal*
 
 Section 4) Basic Demographics
 
-QUESTION 27: one answer, *nominal*
+*done (map)* QUESTION 27: one answer, *nominal*
 
-QUESTION 28: one answer, *nominal*
+*done* QUESTION 28: one answer, *nominal*
 
-QUESTION 29: one answer, *interval*
+*done* QUESTION 29: one answer, *interval*
 
-QUESTION 30: one answer, *nominal/ordinal*
+*done* QUESTION 30: one answer, *nominal/ordinal*
 
-QUESTION 31: one answer, *interval*
+*done* QUESTION 31: one answer, *interval*
 
 QUESTION 32: multiple answers, *nominal*
 
