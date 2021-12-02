@@ -2215,17 +2215,18 @@ gear <- c("Traps or pots", "Hook & line, \nrecreational", "Bottom \ntrawling",
           "Longline", "Gill nets", "Midwater \ntrawling", 
           "Hook & line, \ncommercial", "Spearfishing")
 
-ss24dat <- survey_dat_clean%>%
+ss24 <- survey_dat_clean%>%
   select(q27_1:q27_8) %>%
   pivot_longer(cols = q27_1:q27_8, names_to = "gear_type") %>%
   mutate(value = as.numeric(value))%>%
   group_by(gear_type)%>%
   summarize(mean = mean(value, na.rm = T),
             mean = round(mean, digits = 2),
+            mean_lbl = format(round(mean, digits = 2), nsmall = 2),
             se = std.error(value),
             sd = sd(value, na.rm = T)) %>%
   mutate(gearname = case_when(
-    gear_type == "q27_1" ~ "Traps or \npots",
+    gear_type == "q27_1" ~ "Traps \nor pots",
     gear_type == "q27_2" ~ "Hook & line, \nrecreational",
     gear_type == "q27_3" ~ "Bottom \ntrawling",
     gear_type == "q27_4" ~ "Longline",
@@ -2233,10 +2234,9 @@ ss24dat <- survey_dat_clean%>%
     gear_type == "q27_6" ~ "Midwater \ntrawling",
     gear_type == "q27_7" ~ "Hook & line, \ncommercial",
     gear_type == "q27_8" ~ "Spearfishing",
-  ))
-
-ggplot(data = ss24dat, aes(x = reorder(gearname, -mean, sum), 
-                           y = mean, label = mean))+
+  )) %>%
+  ggplot(aes(x = reorder(gearname, -mean, sum), 
+                           y = mean, label = mean_lbl))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge2(width = 0.9),
             vjust = -0.1,
