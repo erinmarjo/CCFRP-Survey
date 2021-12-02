@@ -2211,7 +2211,9 @@ ss23
 
 ```{r}
 
-gear <- c("Traps or Pots", "")
+gear <- c("Traps or Pots", "Hook & Line, \nrecreational", "Bottom \ntrawling",
+          "Longline", "Gill nets", "Midwater \ntrawling", 
+          "Hook & Line, \ncommercial", "Spearfishing")
 
 ss24 <- survey_dat_clean%>%
   select(q27_1:q27_8) %>%
@@ -2219,9 +2221,24 @@ ss24 <- survey_dat_clean%>%
   mutate(value = as.numeric(value))%>%
   group_by(gear_type)%>%
   summarize(mean = mean(value, na.rm = T),
+            mean = round(mean, digits = 2),
             se = std.error(value),
             sd = sd(value, na.rm = T)) %>%
-  ggplot(aes(x = gear_type, ))
+  ggplot(aes(x = gear_type, y = mean, label = mean))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge2(width = 0.9),
+            vjust = 0.0,
+            hjust = -0.7,
+            size = 4)+
+  scale_y_continuous(limits = c(0, 8))+
+  scale_x_discrete(labels = gear)+
+  labs(x = "Gear Type", y = "Mean Impact Score")+
+  coord_flip()+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
 
 ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
     mutate(pct = n/sum(n)*100,
