@@ -2209,11 +2209,11 @@ ss23
 
 ### **QUESTION 24**
 
-```{r}
+```{r gear type rate set up}
 
-gear <- c("Traps or pots", "Hook & line, \nrecreational", "Bottom \ntrawling",
-          "Longline", "Gill nets", "Midwater \ntrawling", 
-          "Hook & line, \ncommercial", "Spearfishing")
+# gear <- c("Traps or pots", "Hook & line, \nrecreational", "Bottom \ntrawling",
+#           "Longline", "Gill nets", "Midwater \ntrawling", 
+#           "Hook & line, \ncommercial", "Spearfishing")
 
 ss24 <- survey_dat_clean%>%
   select(q27_1:q27_8) %>%
@@ -2239,11 +2239,11 @@ ss24 <- survey_dat_clean%>%
                            y = mean, label = mean_lbl))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge2(width = 0.9),
-            vjust = -0.1,
+            vjust = 0.0,
             hjust = -1.2,
             size = 4)+
   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2)+
-  scale_y_continuous(limits = c(0, 8))+
+  scale_y_continuous(limits = c(0, 8), breaks = c(0:8))+
   scale_x_discrete(limits = rev)+
   labs(x = "Gear Type \n", y = "Mean Impact Score")+
   coord_flip()+
@@ -2253,9 +2253,14 @@ ss24 <- survey_dat_clean%>%
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 12))
 
-
 ```
 
+
+```{r gear type rate plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss24
+
+```
 
 ### **QUESTION 25**
 
