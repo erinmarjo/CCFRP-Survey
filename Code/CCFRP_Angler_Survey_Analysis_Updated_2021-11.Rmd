@@ -2264,6 +2264,40 @@ ss24
 
 ### **QUESTION 25**
 
+```{r ocean issues setup}
+
+ss25 <- survey_dat_clean %>%
+  select(q28_1:q28_9) %>%
+  pivot_longer(cols = q28_1:q28_9, names_to = "oc_issue") %>%
+  mutate(ocean_issue = case_when(
+    oc_issue == "q28_1" ~ "Water \nPollution",
+    oc_issue == "q28_2" ~ "Marine \nDebris",
+    oc_issue == "q28_3" ~ "Loss of \nMarine Biodiversity",
+    oc_issue == "q28_4" ~ "Overfishing",
+    oc_issue == "q28_5" ~ "Invasive/Exotic \nSpecies",
+    oc_issue == "q28_6" ~ "Rising Sea \nTemperatures",
+    oc_issue == "q28_7" ~ "Ocean Acidification \nand Hypoxia",
+    oc_issue == "q28_8" ~ "Wave energy/ \nPower development",
+    oc_issue == "q28_9" ~ "Oil/gas exploration \nor transport"),
+    opinion = case_when(
+      value == 1 ~ "Strongly Disagree",
+      value == 2 ~ "Disagree",
+      value == 3 ~ "Somewhat Disagree",
+      value == 4 ~ "No Opinion",
+      value == 5 ~ "Somewhat Agree",
+      value == 6 ~ "Agree",
+      value == 7 ~ "Strongly Agree",
+    )) %>%
+  mutate(opinion = factor(opinion, levels = c("Strongly Disagree", "Disagree", "Somewhat Disagree", "No Opinion", "Somewhat Agree", "Agree", "Strongly Agree"))) %>%
+  drop_na()
+
+ggplot(data = ss25, aes(x = ocean_issue, y = value, fill = opinion))+
+  geom_bar(position = "stack", stat = "identity")+
+  coord_flip()
+
+```
+
+
 
 ### **QUESTION 26**
 
