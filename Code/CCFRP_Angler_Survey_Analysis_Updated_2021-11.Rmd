@@ -2269,7 +2269,8 @@ ss24
 ss25 <- survey_dat_clean %>%
   select(q28_1:q28_9) %>%
   pivot_longer(cols = q28_1:q28_9, names_to = "oc_issue") %>%
-  mutate(ocean_issue = case_when(
+  mutate(value = as.numeric(value),
+         ocean_issue = case_when(
     oc_issue == "q28_1" ~ "Water \nPollution",
     oc_issue == "q28_2" ~ "Marine \nDebris",
     oc_issue == "q28_3" ~ "Loss of \nMarine Biodiversity",
@@ -2292,8 +2293,11 @@ ss25 <- survey_dat_clean %>%
   drop_na()
 
 ggplot(data = ss25, aes(x = ocean_issue, y = value, fill = opinion))+
-  geom_bar(position = "stack", stat = "identity")+
-  coord_flip()
+  geom_bar(position = "fill", stat = "identity")+
+  labs(y = "Percent Opinion", x = "Potential Ocean Issue")+
+  coord_flip()+
+  theme_bw()+
+  theme(panel.grid = element_blank())
 
 ```
 
