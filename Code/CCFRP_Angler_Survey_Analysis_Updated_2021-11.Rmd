@@ -33,6 +33,7 @@ library(ggsci)        ## for color mixer
 library(lemon)        ## for brackets
 library(ggpubr)       ## for combining plots & common legend
 library(cowplot)      ## plotting images on graph
+library(plotrix)      ## standard error function
 
 ```
 
@@ -2207,6 +2208,40 @@ ss23
 
 
 ### **QUESTION 24**
+
+```{r}
+
+gear <- c("Traps or Pots", "")
+
+ss24 <- survey_dat_clean%>%
+  select(q27_1:q27_8) %>%
+  pivot_longer(cols = q27_1:q27_8, names_to = "gear_type") %>%
+  mutate(value = as.numeric(value))%>%
+  group_by(gear_type)%>%
+  summarize(mean = mean(value, na.rm = T),
+            se = std.error(value),
+            sd = sd(value, na.rm = T)) %>%
+  ggplot(aes(x = gear_type, ))
+
+ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
 
 ### **QUESTION 25**
 
