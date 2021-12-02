@@ -2211,11 +2211,11 @@ ss23
 
 ```{r}
 
-gear <- c("Traps or Pots", "Hook & Line, \nrecreational", "Bottom \ntrawling",
+gear <- c("Traps or pots", "Hook & line, \nrecreational", "Bottom \ntrawling",
           "Longline", "Gill nets", "Midwater \ntrawling", 
-          "Hook & Line, \ncommercial", "Spearfishing")
+          "Hook & line, \ncommercial", "Spearfishing")
 
-ss24 <- survey_dat_clean%>%
+ss24dat <- survey_dat_clean%>%
   select(q27_1:q27_8) %>%
   pivot_longer(cols = q27_1:q27_8, names_to = "gear_type") %>%
   mutate(value = as.numeric(value))%>%
@@ -2224,15 +2224,28 @@ ss24 <- survey_dat_clean%>%
             mean = round(mean, digits = 2),
             se = std.error(value),
             sd = sd(value, na.rm = T)) %>%
-  ggplot(aes(x = gear_type, y = mean, label = mean))+
+  mutate(gearname = case_when(
+    gear_type == "q27_1" ~ "Traps or \npots",
+    gear_type == "q27_2" ~ "Hook & line, \nrecreational",
+    gear_type == "q27_3" ~ "Bottom \ntrawling",
+    gear_type == "q27_4" ~ "Longline",
+    gear_type == "q27_5" ~ "Gill nets",
+    gear_type == "q27_6" ~ "Midwater \ntrawling",
+    gear_type == "q27_7" ~ "Hook & line, \ncommercial",
+    gear_type == "q27_8" ~ "Spearfishing",
+  ))
+
+ggplot(data = ss24dat, aes(x = reorder(gearname, -mean, sum), 
+                           y = mean, label = mean))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge2(width = 0.9),
-            vjust = 0.0,
-            hjust = -0.7,
+            vjust = -0.1,
+            hjust = -1.2,
             size = 4)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2)+
   scale_y_continuous(limits = c(0, 8))+
-  scale_x_discrete(labels = gear)+
-  labs(x = "Gear Type", y = "Mean Impact Score")+
+  scale_x_discrete(limits = rev)+
+  labs(x = "Gear Type \n", y = "Mean Impact Score")+
   coord_flip()+
   theme_bw()+
   theme(panel.grid = element_blank(),
@@ -2240,22 +2253,6 @@ ss24 <- survey_dat_clean%>%
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 12))
 
-ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
-    mutate(pct = n/sum(n)*100,
-           pct = round(pct, digits = 0))%>%
-  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
-  geom_text(position = position_dodge(width = 0.9),
-            vjust = -0.5,
-            size = 4)+
-  scale_y_continuous(limits = c(0,50)) +
-  scale_x_discrete(labels = managed) +
-  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
-  theme_bw() + 
-  theme(panel.grid = element_blank(),
-        legend.position = "none", 
-        axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
 
 ```
 
