@@ -1,7 +1,7 @@
 ---
 title: "CCFRP Survey Basic Figures"
 author: "E. Johnston, E. Brauer, G. Waltz, B. Ruttenberg, D. Wendt"
-date: "12/2/2021"
+date: "December 2021"
 output: 
  prettydoc::html_pretty:
     toc: TRUE
@@ -101,13 +101,16 @@ ss911graph <- ss911df %>%
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
+fig1cap <- "Figure 1. The percentage distribution of respondents’ opinions about the creation of MPAs in California before (dark shaded bars, n = 229) and after volunteering with the California Collaborative Fisheries Research Program (light shaded bars, n = 228).Involvement with CCFRP generally corresponded with an increase in positive feelings about the creation of MPAs in California."
+
 ```
 
-```{r beforeafter_eb plot, fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
+```{r beforeafter_eb plot, fig.cap = paste(fig1cap), fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
 
 ss911graph
 
 ```
+
 
 
 ```{r beforeafter_diff setup, echo = F}
@@ -143,14 +146,31 @@ ss911dif <- bind_cols(ss9dif, ss11dif) %>%
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
+
+fig2cap <- "Figure 2. The percent change in survey respondents’ opinion of California MPAs after volunteering with the California Collaborative Fisheries Research Program (CCFRP), relative to before volunteering with CCFRP (n = 228). There were increases in positive opinions of California MPA’s after involvement with CCFRP, relative to before involvement with CCFRP. All other opinion changes were negative."
+
 ```
 
 
-```{r beforeafter_diff plot, fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
+
+
+```{r beforeafter_diff plot, fig.cap = paste(fig2cap), fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
 
 ss911dif
 
 ```
+
+
+```{r 9 11 samp size, eval = F, echo=F}
+
+n9 <- survey_dat_clean %>% select(q9) %>% drop_na()
+
+
+n11 <- survey_dat_clean %>% select(q11) %>% drop_na() 
+
+
+```
+
 
 ### 10 & 12
 
