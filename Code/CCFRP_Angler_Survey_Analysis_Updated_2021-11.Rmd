@@ -1611,7 +1611,7 @@ ss8
 
 Before and after volunteering with CCFRP, what was your general opinion of the creation of MPAs in California?
 
-```{r beforeafter setup}
+```{r beforeafter setup, eval=FALSE}
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
 
 ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%>% 
@@ -1692,7 +1692,7 @@ ss911graph <- ss911df %>%
 ```
 <a id="beforeafteranchor"></a>
 
-```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center", eval=FALSE}
 
 ss9/ss11
 
@@ -1705,7 +1705,7 @@ ss911graph
 
 ```
 
-###9 and 11 diference 
+### **9 and 11 diference** 
 
 ```{r beforeafter setup}
 
@@ -1731,7 +1731,7 @@ ss911change <- dfnew %>%
   scale_y_continuous(limits = c(-30,30)) +
   scale_x_discrete(labels = beforeafter) +
   labs(y = 'Percent', x ="") +
-  ggtitle("Difference in overall opinion") +
+  ggtitle("Percent change in opinion after volunteering with CCFRP") +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5),
@@ -1759,7 +1759,7 @@ head(dfnew)
 
 This is a 'select all that apply' questions
 
-```{r beforeafter groundfish q10}
+```{r beforeafter groundfish q10, eval=FALSE}
 
 ss10_dat <- survey_dat_clean %>%
   select(q10) %>%
@@ -1801,13 +1801,13 @@ ss10 <- survey_dat_clean %>%
 
 ```
 
-```{r q10 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+```{r q10 plot, fig.height= 6, fig.width= 9, fig.align= "center", eval=FALSE}
 
 ss10
 
 ```
 
-```{r beforeafter groundfish q12}
+```{r beforeafter groundfish q12, eval=FALSE}
 
 ss12 <- survey_dat_clean %>% 
   select(q12) %>% 
@@ -1834,13 +1834,13 @@ ss12 <- survey_dat_clean %>%
 
 ```
 
-```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center", eval=FALSE}
 
 ss12
 
 ```
 
-### Question 10 and 12
+### **Question 10 and 12**
 
 ```{r beforeafter setup}
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
@@ -1881,7 +1881,7 @@ ss1012graph <- ss1012df %>%
   scale_y_continuous(limits = c(0,100)) +
   scale_x_discrete(limits= rev, labels = ba_groundfish_rev) +
   coord_flip() + 
-  labs(x = '\nDo MPAs affect groundifhs size/abundance? \n After Volunteering\n', y = 'Percent') +
+  labs(x = '\nDo MPAs affect groundifhs size/abundance \n After Volunteering\n?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         #legend.position = "none", 
@@ -1897,7 +1897,7 @@ ss1012graph
 ```
 
 
-###10 and 12 diference 
+### **10 and 12 diference** 
 
 ```{r beforeafter setup}
 
@@ -1918,23 +1918,30 @@ ss12fac <- survey_dat_clean %>%
   mutate(pct12 = n/sum(!is.na(survey_dat_clean$q12))*100,
          pct12 = round(pct12, digits = 1))
 
-ss1012fac = (ss12fac$pct - ss10fac$pct)
-as.data.frame(ss1012fact)
+ss1012fac = (ss12fac$pct12 - ss10fac$pct10)
+as.data.frame(ss1012fac)
 
-dfnew = ss11fac %>% add_column(change = ss911fact)
+dfnew = ss12fac %>% add_column(change = ss1012fac)
 
-ss911change <- dfnew %>% 
-  ggplot(aes(x = q11, y = change, label = paste0(change, "%")))+
+
+beforeafter_groundfish <- c("Increase \nSize", "Increase \nAbundance", "Decrease \nSize",
+                            "Decrease \nAbundance", "No Effect \nSize",
+                            "No Effect \nAbundance", "I don\'t know", "No Opinion")
+
+ba_groundfish_rev <- c("No Opinion", "I don\'t know", "No Effect \nAbundance", "No Effect \nSize", "Decrease \nAbundance", "Decrease \nSize", "Increase \nAbundance","Increase \nSize")
+
+ss1012change <- dfnew %>% 
+  ggplot(aes(x = q12, y = change, label = paste0(change, "%")))+
   geom_col(position = "dodge")+
   # , aes(fill = q11, color = q11)
   # scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
   # scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
   geom_text(aes(y = change + 2 * sign(change)), position = position_dodge(width = 0.9),
             size = 4) +
-  scale_y_continuous(limits = c(-30,30)) +
-  scale_x_discrete(labels = beforeafter) +
+  scale_y_continuous(limits = c(-15,15)) +
+ scale_x_discrete(limits= rev, labels = ba_groundfish_rev)+
   labs(y = 'Percent', x ="") +
-  ggtitle("Difference in overall opinion") +
+  ggtitle("Percent change in opinion after volunteering with CCFRP") +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5),
@@ -1944,6 +1951,11 @@ ss911change <- dfnew %>%
 
 ```
 
+```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+
+ss1012change
+
+```
 
 ### **QUESTION 13**
 
