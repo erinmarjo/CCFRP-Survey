@@ -1798,8 +1798,8 @@ ss911dif <- bind_cols(ss9dif, ss11dif) %>%
   geom_hline(yintercept = 0)+
   scale_y_continuous(limits = c(-30,30)) +
   scale_x_discrete(labels = beforeafter) +
-  labs(y = 'Percent', x ="") +
-  ggtitle("Percent Change in Opinion After Volunteering with CCFRP") +
+  labs(y = 'Percent', x ="", 
+       title = "Percent Change in Opinion After Volunteering with CCFRP") +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5),
