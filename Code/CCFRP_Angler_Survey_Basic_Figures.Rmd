@@ -112,6 +112,8 @@ ss911graph
 
 ```{r beforeafter_diff setup, echo = F}
 
+beforeafter_rev <- c('No opinion', 'Negative', 'Somewhat \nnegative','Neutral', 'Somewhat \npositive','Positive'  )
+
 ss9dif <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(option9 = factor(q9))%>% 
     mutate(pct9 = n/sum(n)*100,
            pct9 = round(pct9, digits = 0)) %>%
@@ -130,10 +132,11 @@ ss911dif <- bind_cols(ss9dif, ss11dif) %>%
   geom_text(aes(y = per_dif + 2 * sign(per_dif)), position = position_dodge(width = 0.9),
             size = 4) +
   geom_hline(yintercept = 0)+
-  scale_y_continuous(limits = c(-30,30)) +
-  scale_x_discrete(labels = beforeafter) +
+  scale_y_continuous(limits = c(-30,30), breaks = c(-30, -20, -10, 0, 10, 20, 30)) +
+  scale_x_discrete(limits = rev, labels = beforeafter_rev) +
   labs(y = 'Percent\n', x ="", 
        title = "Percent Change in Opinion After Volunteering with CCFRP") +
+  coord_flip()+
   theme_bw() + 
   theme(panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5),
@@ -179,6 +182,7 @@ beforeafter_groundfish <- c("Increase \nSize", "Increase \nAbundance", "Decrease
                             "Decrease \nAbundance", "No Effect \nSize",
                             "No Effect \nAbundance", "I don\'t \nknow", "No \nOpinion")
 
+
 ss1012graph <- ss1012df %>%
   mutate(question = factor(question, levels = c("Before", "After"))) %>%
   ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
@@ -205,6 +209,9 @@ ss1012graph
 ```
 
 ```{r 1012 setup, echo = F}
+
+ba_groundfish_rev <- c("No Opinion", "I don\'t know", "No Effect \nAbundance", "No Effect \nSize", "Decrease \nAbundance", "Decrease \nSize", "Increase \nAbundance","Increase \nSize")
+
 
 ss10fac <- survey_dat_clean %>% 
   select(q10) %>% 
@@ -234,10 +241,11 @@ ss1012change <- dfnew %>%
   geom_text(aes(y = change + 2 * sign(change)), position = position_dodge(width = 0.9),
             size = 4) +
   geom_hline(yintercept = 0)+
-  scale_y_continuous(limits = c(-15,15)) +
-  scale_x_discrete(labels = beforeafter_groundfish)+
+  scale_y_continuous(limits = c(-20,20)) +
+  scale_x_discrete(limits = rev, labels = ba_groundfish_rev)+
   labs(y = 'Percent\n', x ="",
        title = "Percent change in opinion after volunteering with CCFRP") +
+  coord_flip()+
   theme_bw() + 
   theme(panel.grid = element_blank(),
         plot.title = element_text(hjust = 0.5),
