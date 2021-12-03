@@ -92,7 +92,7 @@ ss911graph <- ss911df %>%
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
   scale_x_discrete(labels = beforeafter) +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() +
   #ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
   theme(panel.grid = element_blank(),
@@ -132,7 +132,7 @@ ss911dif <- bind_cols(ss9dif, ss11dif) %>%
   geom_hline(yintercept = 0)+
   scale_y_continuous(limits = c(-30,30)) +
   scale_x_discrete(labels = beforeafter) +
-  labs(y = 'Percent', x ="", 
+  labs(y = 'Percent\n', x ="", 
        title = "Percent Change in Opinion After Volunteering with CCFRP") +
   theme_bw() + 
   theme(panel.grid = element_blank(),
@@ -189,7 +189,7 @@ ss1012graph <- ss1012df %>%
             size = 4) +
   scale_y_continuous(limits = c(0,100)) +
   scale_x_discrete( labels = beforeafter_groundfish) +
-  labs(x = "", y = 'Percent') +
+  labs(x = "", y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         axis.title=element_text(size=12),
@@ -236,7 +236,7 @@ ss1012change <- dfnew %>%
   geom_hline(yintercept = 0)+
   scale_y_continuous(limits = c(-15,15)) +
   scale_x_discrete(labels = beforeafter_groundfish)+
-  labs(y = 'Percent', x ="",
+  labs(y = 'Percent\n', x ="",
        title = "Percent change in opinion after volunteering with CCFRP") +
   theme_bw() + 
   theme(panel.grid = element_blank(),
@@ -276,7 +276,7 @@ ss13 <- survey_dat_clean %>%
   scale_y_continuous(limits = c(0,90)) +
   scale_x_discrete(labels = mpa_aspects) +
   #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -315,7 +315,7 @@ ss14 <- survey_dat_clean %>%
   scale_y_continuous(limits = c(0,90)) +
   scale_x_discrete(labels = mpa_purpose) +
   #labs(x = '\nWhat is the purpose of an MPA?', y = 'Percent') +
-  labs(x = "", y = 'Percent') +
+  labs(x = "", y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -349,7 +349,7 @@ ss15 <- survey_dat_clean %>% select(q15) %>% drop_na() %>% count(q15 = factor(q1
   scale_y_continuous(limits = c(0,75)) +
   scale_x_discrete(labels = yesno) +
   #labs(x = 'Have You Fished in an MPA?', y = 'Percent') +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -391,7 +391,7 @@ ss16a <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nHigher Abundance', y = '\nPercent') +
+  labs(x = '\nHigher Abundance', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -408,7 +408,7 @@ ss16b <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nGreater Diversity', y = '\nPercent') +
+  labs(x = '\nGreater Diversity', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -425,7 +425,7 @@ ss16c <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nLarger Size', y = '\nPercent') +
+  labs(x = '\nLarger Size', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -460,7 +460,7 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
   scale_y_continuous(limits = c(0,75)) +
   scale_x_discrete(labels = prime_reason) +
   #labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -497,7 +497,7 @@ ss18 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q2
   scale_y_continuous(limits = c(0,50)) +
   scale_x_discrete(labels = money) +
   #labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
-  labs(x = '', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -537,7 +537,7 @@ ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q2
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
   scale_x_discrete(labels = moreless) +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   #labs(x = '\nAre you more or less conservation-minded than others?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
@@ -574,7 +574,7 @@ ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q2
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
   scale_x_discrete(labels = yesno) +
-  labs(x = "", y = "Percent")+
+  labs(x = "", y = "Percent\n")+
   #labs(x = '\nDo you participate with other conservation-oriented groups?', y = 'Percent') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
@@ -610,7 +610,7 @@ ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q2
   scale_y_continuous(limits = c(0,45)) +
   scale_x_discrete(labels = inform) +
   #labs(x = '\nHow informed do you consider yourself to be concerning ocean issues in Califronia?', y = 'Percent') +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -653,7 +653,7 @@ ss22 <- survey_dat_clean %>%
   scale_y_continuous(limits = c(0,90)) +
   scale_x_discrete(labels = info) +
   #labs(x = '\nWhere do you obtain information about ocean-related issues?', y = 'Percent') +
-  labs(x = '', y = 'Percent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -689,7 +689,7 @@ ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q2
   scale_y_continuous(limits = c(0,50)) +
   scale_x_discrete(labels = managed) +
   #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
-  labs(x = '', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
@@ -795,7 +795,7 @@ ss25 <- survey_dat_clean %>%
   drop_na() %>%
   ggplot( aes(x = ocean_issue, y = value, fill = opinion))+
   geom_bar(position = "fill", stat = "identity")+
-  labs(y = "Percent", x = "Potential Ocean Issue")+
+  labs(y = "\nPercent", x = "Potential Ocean Issue\n")+
   scale_fill_brewer(palette = "BrBG")+
   coord_flip()+
   theme_bw()+
@@ -834,7 +834,7 @@ ss26 <- survey_dat_clean %>% select(q39) %>%
             size = 4)+
   scale_y_continuous(limits = c(0,75)) +
  scale_x_discrete(drop = FALSE, labels = c("B", "C", "D", "E", "F", "G")) +
-  labs(x = 'How interconnected are you with nature?', y = 'Percent') +
+  labs(x = 'How interconnected are you with nature?', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
