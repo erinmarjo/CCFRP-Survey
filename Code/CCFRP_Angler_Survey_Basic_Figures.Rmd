@@ -2,7 +2,11 @@
 title: "CCFRP Survey Basic Figures"
 author: "E. Johnston, E. Brauer, G. Waltz, B. Ruttenberg, D. Wendt"
 date: "12/2/2021"
-output: html_document
+output: 
+ prettydoc::html_pretty:
+    toc: TRUE
+    toc_depth: 3
+    theme: architect
 ---
 
 ```{r setup, include=FALSE}
