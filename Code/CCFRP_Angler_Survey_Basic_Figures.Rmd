@@ -441,12 +441,57 @@ ss16c <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q
         axis.text = element_text(size = 12))
 ```
 
-```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center", echo = F}
+```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center", echo = F, eval = F}
 
 ss16a/ss16b/ss16c
 
 ```
 
+
+```{r 16combo setup, echo = F}
+
+ss16a2 <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q = factor(q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0),
+           Difference = "Higher Abundance")
+ss16b2 <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q = factor(q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0),
+           Difference = "Greater Diversity")
+ss16c2 <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q = factor(q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0),
+           Difference = "Larger Size")
+
+ss16com <- bind_rows(ss16a2, ss16b2, ss16c2) %>%
+  mutate(Difference = factor(Difference, levels = c("Higher Abundance", "Larger Size",
+                                                    "Greater Diversity")))
+
+ss16plot <- ggplot(data = ss16com, aes(x = q, y = pct, fill = Difference, 
+                                       label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  scale_fill_npg()+
+  ## for greyscale below
+  #scale_fill_manual(values = c("#333333",  "#666666", "#999999"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5, size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = 'Percent\n') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+
+```
+
+```{r 16combo plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss16plot
+
+```
 
 ### 17
 
@@ -477,14 +522,14 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
 
 ```
 
-```{r primary reason plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+```{r primary reason plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F, eval = F}
 
 ss17
 
 
 ```
 
-
+   > **62%** of CCFRP volunteer fishers say that collecting scientific fishing data is the *primary* reason they enjoy fishing with CCFRP in MPAs.
 
 ### 18
 
@@ -521,6 +566,8 @@ ss18 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q2
 ss18
 
 ```
+
+  > **1/3** of CCFRP volunteer fishers would pay between *$50 and $500* for a day of catch-and-release fishing in an MPA.
 
 ## Section 3) Natural Resource Conservation
 
@@ -569,6 +616,7 @@ Do you participate in activities with conservation-oriented groups (separate fro
 
 ```{r conservation group setup, echo = F}
 
+yesno <- c("Yes", "No")
 
 ## question 20 is q23
 
@@ -592,12 +640,14 @@ ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q2
 
 ```
 
-```{r conservation group plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+```{r conservation group plot, fig.height= 6, fig.width= 9, fig.align= "center", eval = F, echo = F}
 
 ss20
 
 
 ```
+
+  > **55%** of CCFRP volunteer fishers participate in activities with other conservation-oriented groups; **45%** of CCFRP volunteer fishers do not.
 
 ### 21
 
