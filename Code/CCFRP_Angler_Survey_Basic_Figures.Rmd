@@ -97,18 +97,154 @@ ss911graph <- ss911df %>%
 
 ```
 
-```{r beforeafter_eb plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+```{r beforeafter_eb plot, fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
 
 ss911graph
 
 ```
 
 
+```{r beforeafter_diff setup, echo = F}
+
+ss9dif <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(option9 = factor(q9))%>% 
+    mutate(pct9 = n/sum(n)*100,
+           pct9 = round(pct9, digits = 0)) %>%
+  select(option9, pct9)
+
+ss11dif <- survey_dat_clean %>% select(q11) %>% drop_na() %>% 
+  count(option11 = factor(q11))%>% 
+    mutate(pct11 = n/sum(n)*100,
+           pct11 = round(pct11, digits = 0)) %>%
+  select(option11, pct11)
+
+ss911dif <- bind_cols(ss9dif, ss11dif) %>%
+  mutate(per_dif = pct11-pct9) %>%
+  ggplot(aes(x = option9, y = per_dif, label = paste0(per_dif, "%"))) +
+  geom_col(position = "dodge")+
+  geom_text(aes(y = per_dif + 2 * sign(per_dif)), position = position_dodge(width = 0.9),
+            size = 4) +
+  geom_hline(yintercept = 0)+
+  scale_y_continuous(limits = c(-30,30)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(y = 'Percent', x ="") +
+  ggtitle("Percent Change in Opinion After Volunteering with CCFRP") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r beforeafter_diff plot, fig.height= 7, fig.width= 9, fig.align= "center", echo = F}
+
+ss911dif
+
+```
+
 ### 10 & 12. **Before and After** volunteering with CCFRP, did you believe the creation of MPAs would affect the size/abundance of groundfish inside MPAs?
 
 
+```{r q1012og setup}
+
+ss10 <- survey_dat_clean %>% 
+  select(q10) %>% 
+  drop_na() %>%
+  separate_rows(q10) %>% 
+  count(q10 = factor(q10))%>% 
+  mutate(pct10 = n/sum(!is.na(survey_dat_clean$q10))*100,
+         pct10 = round(pct10, digits = 1))
 
 
+ss12 <- survey_dat_clean %>% 
+  select(q12) %>% 
+  drop_na() %>%
+  separate_rows(q12) %>% 
+  count(q12 = factor(q12))%>% 
+  mutate(pct12 = n/sum(!is.na(survey_dat_clean$q12))*100,
+         pct12 = round(pct12, digits = 1))
+
+ss1012df = data.frame(ss10$q10, ss10$pct10, ss12$q12, ss12$pct12) %>% pivot_longer(cols=c('ss10.pct10', 'ss12.pct12'), names_to='question', values_to="pct") %>% mutate(question=as.factor(question),ss10.q10 = as.factor(ss10.q10)) %>% select(-ss12.q12) %>% rename(type = ss10.q10) %>% mutate(question = recode(question, ss10.pct10 = "Before", ss12.pct12 = "After"))
+
+beforeafter_groundfish <- c("Increase \nSize", "Increase \nAbundance", "Decrease \nSize",
+                            "Decrease \nAbundance", "No Effect \nSize",
+                            "No Effect \nAbundance", "I don\'t \nknow", "No \nOpinion")
+
+ss1012graph <- ss1012df %>%
+  mutate(question = factor(question, levels = c("Before", "After"))) %>%
+  ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  scale_fill_manual(values = c("#666666", "#999999"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4) +
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete( labels = beforeafter_groundfish) +
+  labs(x = "", y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        #legend.position = "none", 
+        axis.title=element_text(size=12),
+        legend.title = element_blank(),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r , fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss1012graph
+
+```
+
+```{r 1012 setup, echo = F}
+
+ss10fac <- survey_dat_clean %>% 
+  select(q10) %>% 
+  drop_na() %>%
+  separate_rows(q10) %>% 
+  count(q10 = factor(q10))%>% 
+  mutate(pct10 = n/sum(!is.na(survey_dat_clean$q10))*100,
+         pct10 = round(pct10, digits = 1))
+
+
+ss12fac <- survey_dat_clean %>% 
+  select(q12) %>% 
+  drop_na() %>%
+  separate_rows(q12) %>% 
+  count(q12 = factor(q12))%>% 
+  mutate(pct12 = n/sum(!is.na(survey_dat_clean$q12))*100,
+         pct12 = round(pct12, digits = 1))
+
+ss1012fac = (ss12fac$pct12 - ss10fac$pct10)
+
+dfnew = ss12fac %>% add_column(change = ss1012fac)
+
+
+ss1012change <- dfnew %>% 
+  ggplot(aes(x = q12, y = change, label = paste0(change, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(aes(y = change + 2 * sign(change)), position = position_dodge(width = 0.9),
+            size = 4) +
+  geom_hline(yintercept = 0)+
+  scale_y_continuous(limits = c(-15,15)) +
+  scale_x_discrete(labels = beforeafter_groundfish)+
+  labs(y = 'Percent', x ="") +
+  ggtitle("Percent change in opinion after volunteering with CCFRP") +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r q1012 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss1012change
+
+```
 
 ### 13. If you believe that California MPA creation affected **groundfish abundance and/or size**, what aspect(s) of MPAs do you believe caused these changes?
 
