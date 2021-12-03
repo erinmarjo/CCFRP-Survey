@@ -1,0 +1,670 @@
+---
+title: "CCFRP Survey Basic Figures"
+author: "E. Johnston, E. Brauer, G. Waltz, B. Ruttenberg, D. Wendt"
+date: "12/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = F,
+                      message = F)
+
+```
+
+```{r packages}
+
+library(tidyverse)    ## general
+library(here)         ## calling data
+library(knitr)        ## general
+library(kableExtra)   ## for kable styling
+library(patchwork)    ## for combining plots
+library(ggsci)        ## for color mixer
+library(lemon)        ## for brackets
+library(ggpubr)       ## for combining plots & common legend
+library(cowplot)      ## plotting images on graph
+library(plotrix)      ## standard error function
+
+```
+
+```{r data and cleaning, echo = F}
+
+
+survey_dat <- read_csv(here("Data", "2021-11-17_CCFRP_Angler_Survey_values_corr.csv"))
+
+survey_dat <- survey_dat[-c(1:2),]
+##297 responses
+
+names(survey_dat) <- tolower(names(survey_dat))
+
+survey_dat_clean <- survey_dat %>%
+  filter(finished == 1,
+         distributionchannel != "preview") 
+
+survey_dat_clean <- survey_dat_clean %>%
+  mutate(unanswered = rowSums(is.na(survey_dat_clean))) %>%
+  ## to get rid of the responses where every single question was unanswered.
+  filter(unanswered < 55) %>%
+  mutate(q1 = as.numeric(q1))
+
+
+```
+
+## Section 2) Marine Protected Areas
+
+### 9 & 11. **Before and After** volunteering with CCFRP, what was your general opinion of the creation of MPAs in California? My general opinion or MPA creation was ...
+
+```{r beforeafter_eb setup, echo = F}
+
+beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
+
+ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% 
+  count(q9 = factor(q9))%>% 
+  mutate(pct9 = n/sum(n)*100,
+         pct9 = round(pct9, digits = 0))
+
+ss11 <- survey_dat_clean %>% select(q11) %>% drop_na() %>% 
+  count(q11 = factor(q11)) %>%
+  mutate(pct11 = n/sum(n)*100,
+         pct11 = round(pct11, digits = 0))
+
+ss911df <- data.frame(ss9$q9, ss9$pct9, ss11$q11, ss11$pct11) %>%
+  pivot_longer(cols=c('ss9.pct9', 'ss11.pct11'), names_to='question', values_to="pct") %>%
+  mutate(question=as.factor(question), ss9.q9 = as.factor(ss9.q9)) %>% select(-ss11.q11) %>%
+  rename(type = ss9.q9) %>% 
+  mutate(question = recode(question, ss9.pct9 = "Before", ss11.pct11 = "After"))
+
+
+ss911graph <- ss911df %>%
+  mutate(question = factor(question, levels = c("Before", "After"))) %>%
+  ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  scale_fill_manual(values = c("#666666", "#999999"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '', y = 'Percent') +
+  theme_bw() +
+  ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r beforeafter_eb plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+
+ss911graph
+
+```
+
+
+### 10 & 12. **Before and After** volunteering with CCFRP, did you believe the creation of MPAs would affect the size/abundance of groundfish inside MPAs?
+
+
+
+
+
+### 13. If you believe that California MPA creation affected **groundfish abundance and/or size**, what aspect(s) of MPAs do you believe caused these changes?
+
+```{r q13 setup, echo = F}
+
+mpa_aspects <- c("Location", "Size", "Enforcement", "Network", "Fish population \nprotection", "Voluntary \ncompliance", "Other", "I do not \nbelieve there \nis an effect")
+
+ss13 <- survey_dat_clean %>% 
+  select(q13) %>% 
+  drop_na() %>%
+  separate_rows(q13) %>% 
+  count(q13 = factor(q13))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q13))*100,
+         pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q13, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = mpa_aspects) +
+  labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r q13 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss13
+
+```
+
+
+### 14. In your **opinion**, what is the purpose of a Marine Protected Area? 
+
+```{r q14 setup, echo = F}
+
+mpa_purpose <- c("Conserve, restore, \nand understand \nnatural biodiversity \nand ecology", "Provide opportunity \nto experience \nthese areas ", "Restrict industrial \nuses", "Prevent overfishing\n/overuse/degredation", "No purpose", "No opinion")
+
+ss14 <- survey_dat_clean %>% 
+  select(q14) %>% 
+  drop_na() %>%
+  separate_rows(q14) %>% 
+  count(q14 = factor(q14))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q14))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q14, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = mpa_purpose) +
+  labs(x = '\nWhat is the purpose of an MPA?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 11))
+
+```
+
+```{r q14 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss14
+
+```
+
+### 15. Have you ever fished in a Marine Protected Area before it was protected **OR** while volunteering with CCFRP? (If no, skip to section 3)
+
+```{r fished mpa setup, echo = F}
+
+yesno <- c("Yes", "No")
+
+ss15 <- survey_dat_clean %>% select(q15) %>% drop_na() %>% count(q15 = factor(q15))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q15, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = yesno) +
+  labs(x = 'Have You Fished in an MPA?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r fished mpa plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss15
+
+```
+
+
+### 16. Think about this when answering a-c: Have you experienced a difference in fishing in an MPA versus outside of an MPA? 
+
+### a.  I catch more fish when fishing inside...
+### b. I catch a greater diversity of fish species when fishing inside...
+### c. I catch larger fish when I fish inside...
+
+
+```{r fishingarea setup, echo = F}
+
+## answer option list
+fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
+
+ss16a <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nHigher Abundance', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss16b <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nGreater Diversity', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss16c <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = '\nLarger Size', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+```
+
+```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center", echo = F}
+
+ss16a/ss16b/ss16c
+
+```
+
+
+### 17. What is the **primary** reason you enjoy fishing with CCFRP in an MPA: 
+
+```{r primary reason setup, echo = F}
+
+prime_reason <- c("No preference \nfor MPA", "Larger Fish", "More Fish", "More Species", "Collect Scientific \nFishing Data")
+## question 17 is q19
+
+ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q19))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = prime_reason) +
+  labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r primary reason plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss17
+
+
+```
+
+
+
+### 18. Hypothetically, how much would you be willing to pay for one day of catch and release fishing inside an MPA while **NOT** participating on a CCFRP trip?
+
+```{r mpamoney setup, echo = F, eval = F}
+
+money <- c('$0', '$1 - $20', '$21 - $50', '$51 - 100', '$101 - $500', '>$500')
+
+ss18 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q20))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q20, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = money) +
+  labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+
+```
+
+```{r mpamoney plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F, eval = F}
+
+ss18
+
+```
+
+## Section 3) Natural Resource Conservation
+
+### 19. In general, would you say you are more conservation-minded or less conservation-minded than others in the recreational angling community?
+
+### Compared to the rest of the angling community, I am...
+
+```{r moreless cons setup, echo = F}
+
+moreless <- c("More", "Less", "Similar", "I don\'t know")
+## question 19 is q22
+
+ss19 <- survey_dat_clean %>% select(q22) %>% drop_na() %>% count(q22 = factor(q22))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q22, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = moreless) +
+  labs(x = '\nAre you more or less conservation-minded than others?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r moreless cons plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss19
+
+
+```
+
+### 20. Do you participate in activities with conservation-oriented groups (separate from CCFRP)?
+
+```{r conservation group setup, echo = F}
+
+
+## question 20 is q23
+
+ss20 <- survey_dat_clean %>% select(q23) %>% drop_na() %>% count(q23 = factor(q23))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q23, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = yesno) +
+  labs(x = '\nDo you participate with other conservation-oriented groups?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r conservation group plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss20
+
+
+```
+
+### 21. How informed do you consider yourself to be concerning ocean issues in California?
+
+```{r informed setup, echo = F}
+
+inform = c("Not well", "Somewhat", "Well", "Very Well", "Unsure")
+
+ss21 <- survey_dat_clean %>% select(q24) %>% drop_na() %>% count(q24 = factor(q24))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q24, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,45)) +
+  scale_x_discrete(labels = inform) +
+  labs(x = '\nHow informed do you consider yourself to be concerning ocean issues in Califronia?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+```
+
+```{r informed plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss21
+
+
+```
+
+
+### 22. In what ways do you currently obtain information about ocean related issues? Select all that apply.
+
+
+```{r info setup, echo = F}
+
+## Question 22 is q25
+info <- c("CCFRP \nrelated events", "Newspaper", "Magazine", "Family\n/friends", "Radio", "Internet", "Social \nmedia", "Television", "Other", "I have not \nsought out \ninformation on \nocean-related \nissues")
+
+ss22 <- survey_dat_clean %>% 
+  select(q25) %>% 
+  drop_na() %>%
+  separate_rows(q25) %>% 
+  count(q25 = factor(q25))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q25))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q25, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,90)) +
+  scale_x_discrete(labels = info) +
+  labs(x = '\nWhere do you obtain information about ocean-related issues?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 11))
+
+```
+
+```{r info plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss22
+
+```
+
+### 23. In your opinion, how well are California groundfish stocks managed? 
+
+### I believe California groundfish stocks are:
+
+```{r management setup, echo = F}
+## question 23 is q26
+managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
+
+ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r management plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss23
+
+```
+
+### 24. Please rank the following types of fishing gear or fishing practices(from 1 to 8) as having the greatest impact on the degradation of the marine environment or reduction in fish stocks. (1 is least impact and 8 is greatest impact). 
+
+
+```{r gear type rate set up, echo = F}
+
+# gear <- c("Traps or pots", "Hook & line, \nrecreational", "Bottom \ntrawling",
+#           "Longline", "Gill nets", "Midwater \ntrawling", 
+#           "Hook & line, \ncommercial", "Spearfishing")
+
+ss24 <- survey_dat_clean%>%
+  select(q27_1:q27_8) %>%
+  pivot_longer(cols = q27_1:q27_8, names_to = "gear_type") %>%
+  mutate(value = as.numeric(value))%>%
+  group_by(gear_type)%>%
+  summarize(mean = mean(value, na.rm = T),
+            mean = round(mean, digits = 2),
+            mean_lbl = format(round(mean, digits = 2), nsmall = 2),
+            se = std.error(value),
+            sd = sd(value, na.rm = T)) %>%
+  mutate(gearname = case_when(
+    gear_type == "q27_1" ~ "Traps \nor pots",
+    gear_type == "q27_2" ~ "Hook & line, \nrecreational",
+    gear_type == "q27_3" ~ "Bottom \ntrawling",
+    gear_type == "q27_4" ~ "Longline",
+    gear_type == "q27_5" ~ "Gill nets",
+    gear_type == "q27_6" ~ "Midwater \ntrawling",
+    gear_type == "q27_7" ~ "Hook & line, \ncommercial",
+    gear_type == "q27_8" ~ "Spearfishing",
+  )) %>%
+  ggplot(aes(x = reorder(gearname, -mean, sum), 
+                           y = mean, label = mean_lbl))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge2(width = 0.9),
+            vjust = 0.0,
+            hjust = -1.2,
+            size = 4)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2)+
+  scale_y_continuous(limits = c(0, 8), breaks = c(0:8))+
+  scale_x_discrete(limits = rev)+
+  labs(x = "Gear Type \n", y = "Mean Impact Score")+
+  coord_flip()+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
+
+```
+
+
+```{r gear type rate plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss24
+
+```
+
+### 25. This question consists of a chart that queries you on your opinion of potential ocean issues. Statements are rated 1-7. An answer of ‘1’ indicates that you strongly disagree, ‘4’ indicates no opinion, and ‘7’ indicates you strongly agree with the statement.
+
+```{r ocean issues setup, echo = F}
+
+ss25 <- survey_dat_clean %>%
+  select(q28_1:q28_9) %>%
+  pivot_longer(cols = q28_1:q28_9, names_to = "oc_issue") %>%
+  mutate(value = as.numeric(value),
+         ocean_issue = case_when(
+    oc_issue == "q28_1" ~ "Water \nPollution",
+    oc_issue == "q28_2" ~ "Marine \nDebris",
+    oc_issue == "q28_3" ~ "Loss of \nMarine Biodiversity",
+    oc_issue == "q28_4" ~ "Overfishing",
+    oc_issue == "q28_5" ~ "Invasive/Exotic \nSpecies",
+    oc_issue == "q28_6" ~ "Rising Sea \nTemperatures",
+    oc_issue == "q28_7" ~ "Ocean Acidification \nand Hypoxia",
+    oc_issue == "q28_8" ~ "Wave energy/ \nPower development",
+    oc_issue == "q28_9" ~ "Oil/gas exploration \nor transport"),
+    opinion = case_when(
+      value == 1 ~ "Strongly Disagree",
+      value == 2 ~ "Disagree",
+      value == 3 ~ "Somewhat Disagree",
+      value == 4 ~ "No Opinion",
+      value == 5 ~ "Somewhat Agree",
+      value == 6 ~ "Agree",
+      value == 7 ~ "Strongly Agree",
+    )) %>%
+  mutate(opinion = factor(opinion, levels = c("Strongly Disagree", "Disagree", "Somewhat Disagree", "No Opinion", "Somewhat Agree", "Agree", "Strongly Agree"))) %>%
+  drop_na() %>%
+  ggplot( aes(x = ocean_issue, y = value, fill = opinion))+
+  geom_bar(position = "fill", stat = "identity")+
+  labs(y = "Percent", x = "Potential Ocean Issue")+
+  scale_fill_brewer(palette = "BrBG")+
+  coord_flip()+
+  theme_bw()+
+  theme(panel.grid = element_blank())
+
+```
+
+```{r ocean issues plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss25
+
+```
+
+
+### 26. How interconnected are you with nature? (1 - 7, where 1 is completely separated and 7 is completely interconnected)
+
+```{r interconnected setup, echo = F}
+
+
+f = (survey_dat_clean$q39)
+survey_dat_clean$q39 = factor(survey_dat_clean$q39, levels = c(1, 2, 3, 4, 5, 6, 7))
+
+
+ss26 <- survey_dat_clean %>% select(q39) %>% 
+  drop_na() %>% 
+  count(q39 = factor(q39), drop = FALSE)%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 1), drop = FALSE)%>%
+  mutate(q39=factor(q39))%>%
+  ggplot(aes(x = q39, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+ scale_x_discrete(drop = FALSE, labels = c("B", "C", "D", "E", "F", "G")) +
+  labs(x = 'How interconnected are you with nature?', y = 'Percent') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+ss26.1 = ggdraw(ss26) +
+  draw_image("vendiagram.png", scale = .5, y = .3)
+```
+
+
+```{r interconnected plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss26.1
+
+```

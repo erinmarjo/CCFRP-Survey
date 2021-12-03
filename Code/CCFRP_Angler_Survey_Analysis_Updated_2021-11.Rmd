@@ -1614,7 +1614,7 @@ Before and after volunteering with CCFRP, what was your general opinion of the c
 ```{r beforeafter setup, eval=FALSE}
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
 
-ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%>% 
+ss9og <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q9, y = pct, label = paste0(pct, "%")))+
@@ -1634,7 +1634,7 @@ ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
-ss11 <- survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q11))%>% 
+ss11og <- survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q11))%>% 
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q11, y = pct, label = paste0(pct, "%")))+
@@ -1653,29 +1653,22 @@ ss11 <- survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q1
         #legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
-```
 
-
-```{r beforeafter setup}
-beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
-
-ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q9 = factor(q9))%>% 
-    mutate(pct9 = n/sum(n)*100,
-           pct9 = round(pct9, digits = 0))
-
-ss11 = survey_dat_clean %>% select(q11) %>% drop_na() %>% count(q11 = factor(q11)) %>% 
-    mutate(pct11 = n/sum(n)*100,
-           pct11 = round(pct11, digits = 0))
-
-ss911df = data.frame(ss9$q9, ss9$pct9, ss11$q11, ss11$pct11) %>% pivot_longer(cols=c('ss9.pct9', 'ss11.pct11'), names_to='question', values_to="pct") %>% mutate(question=as.factor(question),ss9.q9 = as.factor(ss9.q9)) %>% select(-ss11.q11) %>% rename(type = ss9.q9) %>% mutate(question = recode(question, ss9.pct9 = "before", ss11.pct11 = "after"))
-
-ss911graph <- ss911df %>%
-  mutate(question = factor(question, levels = c("before", "after"))) %>%
-  ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
+ss911 <- survey_dat_clean %>%
+  select(q9, q11)  %>%
+  pivot_longer(cols = q9:q11, names_to = "question") %>%
+  group_by(value) %>%
+  count(question = factor(question)) %>%
+  group_by(question) %>%
+  mutate(pct = n/sum(n)*100,
+         pct = round(pct, digits = 0),
+         ba = case_when(
+           question == "q9" ~ "Before",
+           question == "q11" ~ "After"),
+         ba = factor(ba, levels = c("Before", "After"))) %>%
+  ggplot(aes(x = value, y = pct, fill = ba, label = paste0(pct, "%")))+
   geom_col(position = "dodge")+
-  # , aes(fill = q11, color = q11)
-  # scale_color_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
-  # scale_fill_manual(values = c("#336633", "#336633", "#FFCC99", "#CC0000", "#CC0000", "#666666"))+
+  scale_fill_manual(values = c("#666666", "#999999"))+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
@@ -1683,23 +1676,69 @@ ss911graph <- ss911df %>%
   scale_x_discrete(labels = beforeafter) +
   labs(x = '', y = 'Percent') +
   theme_bw() +
-  ggtitle("Opinion about MPAs before and after volunteering with CCFRP") +
+  ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
   theme(panel.grid = element_blank(),
         legend.title = element_blank(),
         plot.title = element_text(hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
+
 ```
+
+
+```{r beforeafter_eb setup}
+
+beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
+
+ss9 <- survey_dat_clean %>% select(q9) %>% drop_na() %>% 
+  count(q9 = factor(q9))%>% 
+  mutate(pct9 = n/sum(n)*100,
+         pct9 = round(pct9, digits = 0))
+
+ss11 <- survey_dat_clean %>% select(q11) %>% drop_na() %>% 
+  count(q11 = factor(q11)) %>%
+  mutate(pct11 = n/sum(n)*100,
+         pct11 = round(pct11, digits = 0))
+
+ss911df <- data.frame(ss9$q9, ss9$pct9, ss11$q11, ss11$pct11) %>%
+  pivot_longer(cols=c('ss9.pct9', 'ss11.pct11'), names_to='question', values_to="pct") %>%
+  mutate(question=as.factor(question), ss9.q9 = as.factor(ss9.q9)) %>% select(-ss11.q11) %>%
+  rename(type = ss9.q9) %>% 
+  mutate(question = recode(question, ss9.pct9 = "Before", ss11.pct11 = "After"))
+
+
+ss911graph <- ss911df %>%
+  mutate(question = factor(question, levels = c("Before", "After"))) %>%
+  ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge")+
+  scale_fill_manual(values = c("#666666", "#999999"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,75)) +
+  scale_x_discrete(labels = beforeafter) +
+  labs(x = '', y = 'Percent') +
+  theme_bw() +
+  ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+
 <a id="beforeafteranchor"></a>
 
 ```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center", eval=FALSE}
 
-ss9/ss11
+ss9og/ss11og
 
 ```
 
 
-```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+```{r beforeafter_eb plot, fig.height= 7, fig.width= 9, fig.align= "center"}
 
 ss911graph
 
@@ -1707,7 +1746,7 @@ ss911graph
 
 ### **9 and 11 diference** 
 
-```{r beforeafter setup}
+```{r  }
 
 ss9fac <- survey_dat_clean %>% select(q9) %>% drop_na() %>% count(q11 = factor(q9))%>% 
     mutate(pct = n/sum(n)*100,
@@ -1741,7 +1780,7 @@ ss911change <- dfnew %>%
 
 ```
 
-```{r beforeafter plot, fig.height= 7, fig.width= 9, fig.align= "center"}
+```{r , fig.height= 7, fig.width= 9, fig.align= "center"}
 
 ss911change
 
@@ -1842,7 +1881,7 @@ ss12
 
 ### **Question 10 and 12**
 
-```{r beforeafter setup}
+```{r q1012og setup}
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
 
 ss10 <- survey_dat_clean %>% 
@@ -1890,7 +1929,7 @@ ss1012graph <- ss1012df %>%
         axis.text = element_text(size = 12))
 ```
 
-```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+```{r , fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss1012graph
 
@@ -1899,7 +1938,7 @@ ss1012graph
 
 ### **10 and 12 diference** 
 
-```{r beforeafter setup}
+```{r 1012 setup}
 
 ss10fac <- survey_dat_clean %>% 
   select(q10) %>% 
@@ -1951,7 +1990,7 @@ ss1012change <- dfnew %>%
 
 ```
 
-```{r q12 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
+```{r q1012 plot, fig.height= 6, fig.width= 9, fig.align= "center"}
 
 ss1012change
 
