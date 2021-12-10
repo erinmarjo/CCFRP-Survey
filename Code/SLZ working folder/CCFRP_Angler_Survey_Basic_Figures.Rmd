@@ -1,6 +1,6 @@
 ---
 title: "CCFRP Survey Basic Figures"
-author: "E. Johnston, E. Brauer, G. Waltz, B. Ruttenberg, D. Wendt"
+author: "E. Johnston, E. Brauer, G. Waltz, B. Ruttenberg, D. Wendt - Updated by S. Ziegler"
 date: "December 2021"
 output: 
  prettydoc::html_pretty:
@@ -36,11 +36,10 @@ library(plotrix)      ## standard error function
 
 ```{r data and cleaning, echo = F}
 
-
-survey_dat <- read_csv(here("Code/SLZ working folder/2021-11-17_CCFRP_Angler_Survey_values_corr.csv"))
+survey_dat <- read_csv(here("Code/SLZ working folder/2021-12-10CCFRP Angler Survey.csv"))
 
 survey_dat <- survey_dat[-c(1:2),]
-##297 responses
+##351 responses
 
 names(survey_dat) <- tolower(names(survey_dat))
 
@@ -53,7 +52,6 @@ survey_dat_clean <- survey_dat_clean %>%
   ## to get rid of the responses where every single question was unanswered.
   filter(unanswered < 55) %>%
   mutate(q1 = as.numeric(q1))
-
 
 ```
 
@@ -944,8 +942,7 @@ The percentage distribution of respondents’ opinions about the creation of MPA
 
 survey_dat_filter<-survey_dat_clean%>%
   select(q1,q2,q3,q4,q30,q9,q10,q11,q12, q13, q16, q17, q18, q26)
-
-
+#survey_dat_filter$q1 <- recode(survey_dat_filter$q1, 20118 = 2018)
 ```
 
 Examine the percentage distribution of respondents’ opinions about the creation of MPAs in California before or after volunteering with the California Collaborative Fisheries Research Program by year of initial volunteering
@@ -968,7 +965,7 @@ q9<-q9%>%
   group_by(q1)%>%
   mutate(pct9 = n/sum(n)*100,
         pct9 = round(pct9, digits = 1))%>%
-  filter(q1>=2007)
+  filter(q1>=2007 & q1<=2021)
 
 q9$q1<-as.factor(q9$q1)
 
@@ -1002,7 +999,7 @@ q11<-q11%>%
   group_by(q1)%>%
   mutate(pct11 = n/sum(n)*100,
         pct11 = round(pct11, digits = 1))%>%
-  filter(q1>=2007)
+   filter(q1>=2007 & q1<=2021)
 
 q11$q1<-as.factor(q11$q1)
 
