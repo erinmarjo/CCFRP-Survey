@@ -811,16 +811,15 @@ ss24 <- survey_dat_clean%>%
     gear_type == "q27_5" ~ "Gill nets",
     gear_type == "q27_6" ~ "Midwater \ntrawling",
     gear_type == "q27_7" ~ "Hook & line, \ncommercial",
-    gear_type == "q27_8" ~ "Spearfishing",
-  )) %>%
+    gear_type == "q27_8" ~ "Spearfishing", )) %>%
   ggplot(aes(x = reorder(gearname, -mean, sum), 
-                           y = mean, label = mean_lbl))+
+                           y = mean, label = mean_lbl, aes(color=gearname)))+
   geom_col(position = "dodge")+
   geom_text(position = position_dodge2(width = 0.9),
             vjust = 0.0,
             hjust = -1.2,
             size = 4)+
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color=gearname), width = 0.2)+
   scale_y_continuous(limits = c(0, 8), breaks = c(0:8))+
   scale_x_discrete(limits = rev)+
   labs(x = "Gear Type \n", y = "Mean Impact Score")+
@@ -941,7 +940,7 @@ The percentage distribution of respondents’ opinions about the creation of MPA
 # question 23 is q26
 
 survey_dat_filter<-survey_dat_clean%>%
-  select(q1,q2,q3,q4,q30,q9,q10,q11,q12, q13, q16, q17, q18, q26)
+  select(responseid,q1,q2,q3,q4,q30,q9,q10,q11,q12, q13, q16, q17, q18, q26)
 #survey_dat_filter$q1 <- recode(survey_dat_filter$q1, 20118 = 2018)
 ```
 
@@ -1071,6 +1070,7 @@ before<-ggplot(q9.4, aes(x=q9, y=pct9, fill=q4, label = paste0(pct9, "%")))+
   scale_fill_discrete(labels = institution, "Institution")+
    labs(x = '', y = 'Percent\n') +
   theme_bw() +
+  facet_wrap(~q4, labeller=labeller)+
   geom_text(position = position_dodge(width = 1),
             vjust = -0.5,
             size = 2)+
@@ -1104,6 +1104,7 @@ after<-ggplot(q11.4, aes(x=q11, y=pct11, fill=q4, label = paste0(pct11, "%")))+
   scale_fill_discrete(labels = institution, "Institution")+ 
   labs(x = '', y = 'Percent\n') +
   theme_bw() +
+  facet_wrap(~q4, labeller=labeller)+
   geom_text(position = position_dodge(width = 1),
             vjust = -0.5,
             size = 2)+
@@ -1138,6 +1139,24 @@ ggplot(q911.4, aes(x=q11, y=change, fill=q4, label = paste0(change, "%")))+
         axis.text = element_text(size = 12),
         legend.position = "none")+
   facet_wrap(~q4, labeller=labeller)
+
+
+
+xx<-survey_dat_filter%>%select(responseid, q9, q11)%>%drop_na()%>%
+  filter(q9!="6" & q11!="6")%>%
+  group_by(responseid)
+xx$q9<-as.numeric(xx$q9)
+xx$q11<-as.numeric(xx$q11)
+
+xx$change<-xx$q9-xx$q11
+
+
+
+  group_by(q4)%>%
+  count(q9 = factor(q9))%>%
+  spread(q9, n)
+
+  
 ```
 
 
