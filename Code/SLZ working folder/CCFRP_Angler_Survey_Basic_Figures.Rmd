@@ -1041,7 +1041,7 @@ ggplot(q911.1, aes(x=q11, y=change, fill=q1, label = paste0(change, "%")))+
 
 ```
 
-Perception of MPAs Before and After working with CCFRP based on insitution
+Perception of MPAs Before and After working with CCFRP Based on insitution
 
 ```{r}
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
@@ -1141,21 +1141,142 @@ ggplot(q911.4, aes(x=q11, y=change, fill=q4, label = paste0(change, "%")))+
   facet_wrap(~q4, labeller=labeller)
 
 
+```
 
-xx<-survey_dat_filter%>%select(responseid, q9, q11)%>%drop_na()%>%
-  filter(q9!="6" & q11!="6")%>%
-  group_by(responseid)
-xx$q9<-as.numeric(xx$q9)
-xx$q11<-as.numeric(xx$q11)
+Recode institution as a managment region: North, Central, or South to examine change in perception based on region of sampling. 
 
-xx$change<-xx$q9-xx$q11
+```{r}
+survey_dat_filter$Region<-survey_dat_filter$q4
 
+survey_dat_filter$Region<-as.factor(survey_dat_filter$Region)
 
-
-  group_by(q4)%>%
+survey_dat_filter$Region<-recode_factor(survey_dat_filter$Region, `1` = "North", `2` ="North", `3` ="Central", `4` = "Central", `5` = "South", `6` ="South")
+                           
+q9.R<-survey_dat_filter%>%select(Region, q9)%>%drop_na()%>%
+  group_by(Region)%>%
   count(q9 = factor(q9))%>%
   spread(q9, n)
 
+q9.R[is.na(q9.R)] <- 0
+  
+str(q9.R)
+
+q9.R<-q9.R%>%
+  gather(q9, n, -Region)%>%
+  group_by(Region)%>%
+  mutate(pct9 = n/sum(n)*100,
+        pct9 = round(pct9, digits = 1))
+
+beforR<-ggplot(q9.R, aes(x=q9, y=pct9, fill=Region, label = paste0(pct9, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+  scale_fill_discrete(labels = institution, "Institution")+
+   labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Region, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 2)+
+  ggtitle("Opinion about MPAs Before Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+# Start examining question 11 in relation to the year of initial participation
+q11.R<-survey_dat_filter%>%select(Region, q11)%>%drop_na()%>%
+  group_by(Region)%>%
+  count(q11 = factor(q11))%>%
+  spread(q11, n)
+
+q11.R[is.na(q11.R)] <- 0
+  
+str(q11.R)
+
+q11.R<-q11.R%>%
+  gather(q11, n, -Region)%>%
+  group_by(Region)%>%
+  mutate(pct11 = n/sum(n)*100,
+        pct11 = round(pct11, digits = 1))
+
+
+after<-ggplot(q11.R, aes(x=q11, y=pct11, fill=Region, label = paste0(pct11, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Region, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 2)+
+  ggtitle("Opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+
+#Group the question 9 and 11 to calculate the % change after working with CCFRP.
+q911.R<-left_join(q9.R, q11.R,by="Region")%>%
+  filter(q9==q11)
+q911.R$change<-(q911.R$pct11-q911.R$pct9)
+
+
+ggplot(q911.R, aes(x=q11, y=change, fill=Region, label = paste0(change, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+ # scale_y_continuous(limits = c(0,85))+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 2)+
+  ggtitle("Change in opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+  facet_wrap(~Region)
+```
+
+
+Examine the Magnitude of Change in perception of MPAs after working with CCFRP.
+
+```{r}
+xx<-survey_dat_filter%>%select(responseid,Region, q9, q11)%>%drop_na()%>%
+  filter(q9!="6" & q11!="6")%>%
+  group_by(responseid, Region)
+xx$q9<-as.numeric(xx$q9)
+xx$q11<-as.numeric(xx$q11)
+
+
+X1 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative')
+
+xx$change<-xx$q9-xx$q11
+xx$q9<-as.factor(xx$q9)
+
+#Overall Response
+ggplot(xx, aes(x=change))+
+  geom_bar(stat="count", aes(fill=q9), color="black")+
+  theme_bw()+
+  xlim(-4,4)+
+  geom_vline(xintercept=0, linetype="dashed", size=0.5)+
+  xlab("Magnitude of Change in Opinions of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)
+
+#Response by Region
+ggplot(xx, aes(x=change))+
+  geom_bar(stat="count", aes(fill=q9), color="black")+
+  theme_bw()+
+  xlim(-4,4)+
+  geom_vline(xintercept=0, linetype="dashed", size=0.5)+
+  xlab("Magnitude of Change in Opinions of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+facet_wrap(~Region)
+#More Positive or less Positive 
   
 ```
 
