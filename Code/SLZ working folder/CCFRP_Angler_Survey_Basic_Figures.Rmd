@@ -86,7 +86,7 @@ ss911graph <- ss911df %>%
   mutate(question = factor(question, levels = c("Before", "After"))) %>%
   ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge", color="black")+
-  scale_fill_manual(values = c("#e0e0e0", "#1a1a1a"))+
+  scale_fill_manual(values = c("#ffffff", "#000000"))+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
@@ -94,10 +94,10 @@ ss911graph <- ss911df %>%
   scale_x_discrete(labels = beforeafter) +
   labs(x = '', y = 'Percent\n') +
   theme_bw() +
-  #ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
-  theme(panel.grid = element_blank(),
+  ggtitle("Opinion about MPAs Before and After Volunteering with CCFRP") +
+   theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.title = element_blank(),
-        plot.title = element_text(hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -130,8 +130,9 @@ ss11dif <- survey_dat_clean %>% select(q11) %>% drop_na() %>%
 
 ss911dif <- bind_cols(ss9dif, ss11dif)%>%
   mutate(per_dif = pct11-pct9) %>%
-  ggplot(aes(x = option9, y = per_dif, label = paste0(per_dif, "%"))) +
-  geom_col(position = "dodge")+
+  ggplot(aes(x = option9, y = per_dif, label = paste0(per_dif, "%"), fill=option9))+
+  geom_col(position = "dodge", color="black")+
+  scale_fill_viridis_d(option="mako",labels=beforeafter, direction = -1)+
   geom_text(aes(y = per_dif + 2 * sign(per_dif)), position = position_dodge(width = 0.9),
             size = 4) +
   geom_hline(yintercept = 0)+
@@ -142,9 +143,11 @@ ss911dif <- bind_cols(ss9dif, ss11dif)%>%
   coord_flip()+
   theme_bw() + 
   theme(panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.title = element_blank(),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
+
 
 
 fig2cap <- "Figure 2. The percent change in survey respondents’ opinion of California MPAs after volunteering with the California Collaborative Fisheries Research Program (CCFRP), relative to before volunteering with CCFRP (n = 228). There were increases in positive opinions of California MPA’s after involvement with CCFRP, relative to before involvement with CCFRP. All other opinion changes were negative."
@@ -256,7 +259,7 @@ dfnew = ss12fac %>% add_column(change = ss1012fac)
 
 
 ss1012change <- dfnew %>% 
-  ggplot(aes(x = q12, y = change, label = paste0(change, "%")))+
+  ggplot(aes(x = q12, y = change, label = paste0(round(change, digits = 1), "%")))+
   geom_col(position = "dodge")+
   geom_text(aes(y = change + 2 * sign(change)), position = position_dodge(width = 0.9),
             size = 4) +
@@ -277,7 +280,7 @@ ss1012change <- dfnew %>%
 
 ```{r q1012 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
 
-ss1012change
+ss1012graph/ss1012change
 
 ```
 
@@ -297,16 +300,18 @@ ss13 <- survey_dat_clean %>%
   mutate(pct = n/sum(!is.na(survey_dat_clean$q13))*100,
          pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q13, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,90)) +
   scale_x_discrete(labels = mpa_aspects) +
   #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  ggtitle("If you believe that California MPA creation affected groundfish abundance and/or size, \n what aspect(s) of MPAs do you believe caused these changes?")+
   labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
@@ -336,7 +341,7 @@ ss14 <- survey_dat_clean %>%
   mutate(pct = n/sum(!is.na(survey_dat_clean$q14))*100,
          pct = round(pct, digits = 1))%>%
   ggplot(aes(x = q14, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
@@ -345,8 +350,10 @@ ss14 <- survey_dat_clean %>%
   #labs(x = '\nWhat is the purpose of an MPA?', y = 'Percent') +
   labs(x = "", y = 'Percent\n') +
   theme_bw() + 
+  ggtitle("In your opinion, what is the purpose of a Marine Protected Area?")+
   theme(panel.grid = element_blank(),
-        legend.position = "none", 
+        legend.position = "none",
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 11))
 
@@ -370,7 +377,7 @@ ss15 <- survey_dat_clean %>% select(q15) %>% drop_na() %>% count(q15 = factor(q1
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q15, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge",)+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
@@ -413,15 +420,17 @@ ss16a <- survey_dat_clean %>% select(q16) %>% drop_na() %>% count(q16 = factor(q
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q16, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nHigher Abundance', y = 'Percent\n') +
+  labs(x = '', y = 'Percent\n') +
   theme_bw() + 
+  ggtitle("Have you experienced a difference in fishing in a MPA versus outside of an MPA? \n \n Higher Abundance")+
   theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
@@ -430,16 +439,18 @@ ss16b <- survey_dat_clean %>% select(q17) %>% drop_na() %>% count(q17 = factor(q
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q17, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nGreater Diversity', y = 'Percent\n') +
+  labs(x = '', y = 'Percent\n') +
+  ggtitle("Greater Diversity")+
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -447,16 +458,18 @@ ss16c <- survey_dat_clean %>% select(q18) %>% drop_na() %>% count(q18 = factor(q
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q18, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nLarger Size', y = 'Percent\n') +
+  ggtitle("Larger Size")+
+  labs(x = ' ', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 ```
@@ -492,14 +505,16 @@ ss16plot <- ggplot(data = ss16com, aes(x = q, y = pct, fill = Difference,
   geom_col(position = "dodge", color="black")+
   #scale_fill_npg()+
   ## for greyscale below
-  scale_fill_manual(values = c("#ffffff",  "#bababa", "#1a1a1a"))+
+  scale_fill_brewer()+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5, size = 4)+
   scale_y_continuous(limits = c(0,85)) +
   scale_x_discrete(labels = fishingarea) +
-  labs(x = '\nLarger Size', y = 'Percent\n') +
+  labs(x = '', y = 'Percent\n') +
+  ggtitle("Have you experienced a difference in fishing in a MPA versus outside of an MPA?")+
   theme_bw() + 
   theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -526,7 +541,7 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q19, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge",fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
@@ -535,7 +550,9 @@ ss17 <- survey_dat_clean %>% select(q19) %>% drop_na() %>% count(q19 = factor(q1
   #labs(x = '\nWhat is the primary reason you enjoy MPA fishing with CCFRP?', y = 'Percent') +
   labs(x = '', y = 'Percent\n') +
   theme_bw() + 
+  ggtitle("What is the primary reason you enjoy MPA fishing with CCFRP?")+
   theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         legend.position = "none", 
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
@@ -563,17 +580,19 @@ ss18 <- survey_dat_clean %>% select(q20) %>% drop_na() %>% count(q20 = factor(q2
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q20, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,50)) +
   scale_x_discrete(labels = money) +
   #labs(x = '\nHow Much Would You Pay to Fish in an MPA?', y = '\nPercent') +
+  ggtitle("How Much Would You Pay to Fish in an MPA?")+
   labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -760,17 +779,19 @@ ss23 <- survey_dat_clean %>% select(q26) %>% drop_na() %>% count(q26 = factor(q2
     mutate(pct = n/sum(n)*100,
            pct = round(pct, digits = 0))%>%
   ggplot(aes(x = q26, y = pct, label = paste0(pct, "%")))+
-  geom_col(position = "dodge")+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
             size = 4)+
   scale_y_continuous(limits = c(0,50)) +
   scale_x_discrete(labels = managed) +
   #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  ggtitle("How Well Managed are California Fisheries?")+
   labs(x = '', y = 'Percent\n') +
   theme_bw() + 
   theme(panel.grid = element_blank(),
         legend.position = "none", 
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -813,20 +834,23 @@ ss24 <- survey_dat_clean%>%
     gear_type == "q27_7" ~ "Hook & line, \ncommercial",
     gear_type == "q27_8" ~ "Spearfishing", )) %>%
   ggplot(aes(x = reorder(gearname, -mean, sum), 
-                           y = mean, label = mean_lbl, aes(color=gearname)))+
-  geom_col(position = "dodge")+
+                           y = mean, label = mean_lbl))+
+  scale_fill_brewer()+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
   geom_text(position = position_dodge2(width = 0.9),
             vjust = 0.0,
             hjust = -1.2,
             size = 4)+
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se, color=gearname), width = 0.2)+
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0.2)+
   scale_y_continuous(limits = c(0, 8), breaks = c(0:8))+
   scale_x_discrete(limits = rev)+
   labs(x = "Gear Type \n", y = "Mean Impact Score")+
   coord_flip()+
   theme_bw()+
+  ggtitle("Which fishing gear or fishing practices have the greatest impact on \n the degradation of the marine environment or reduction in fish stocks?")+
   theme(panel.grid = element_blank(),
         legend.position = "none",
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title = element_text(size = 12),
         axis.text = element_text(size = 12))
 
@@ -870,13 +894,17 @@ ss25 <- survey_dat_clean %>%
     )) %>%
   mutate(opinion = factor(opinion, levels = c("Strongly Disagree", "Disagree", "Somewhat Disagree", "No Opinion", "Somewhat Agree", "Agree", "Strongly Agree"))) %>%
   drop_na() %>%
-  ggplot( aes(x = ocean_issue, y = value, fill = opinion))+
+  ggplot(aes(x = ocean_issue, y = value, fill = opinion))+
   geom_bar(position = "fill", stat = "identity")+
   labs(y = "\nPercent", x = "Potential Ocean Issue\n")+
-  scale_fill_brewer(palette = "BrBG")+
+  ggtitle("Are these issues a threat to California's marine environment?")+
+  scale_fill_brewer(palette = "BrBG", "Opinion")+
   coord_flip()+
   theme_bw()+
-  theme(panel.grid = element_blank())
+ theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+         axis.title = element_text(size = 12),
+        axis.text = element_text(size = 12))
 
 ```
 
@@ -940,8 +968,31 @@ The percentage distribution of respondents’ opinions about the creation of MPA
 # question 23 is q26
 
 survey_dat_filter<-survey_dat_clean%>%
-  select(responseid,q1,q2,q3,q4,q30,q9,q10,q11,q12, q13, q16, q17, q18, q26)
+  select(responseid,q1,q2,q3,q4,q30,q9,q10,q11,q12, q13, q16, q17, q18, q26, q32)
 #survey_dat_filter$q1 <- recode(survey_dat_filter$q1, 20118 = 2018)
+
+#Recode Region, demographic unformation and participation information for further analysis. 
+
+#Region
+survey_dat_filter$Region<-survey_dat_filter$q4
+survey_dat_filter$Region<-as.factor(survey_dat_filter$Region)
+survey_dat_filter$Region<-recode_factor(survey_dat_filter$Region, `1` = "North", `2` ="North", `3` ="Central", `4` = "Central", `5` = "South", `6` ="South")
+                  
+#Age Group
+survey_dat_filter$Age<-survey_dat_filter$q32
+survey_dat_filter$Age<-as.factor(survey_dat_filter$Age)
+survey_dat_filter$Age<-recode_factor(survey_dat_filter$Age, `1` = "18-34", `2` ="18-34", `3` ="35-54", `4` = "35-54", `5` = "55+", `6` ="55+")
+
+#Frequency of Participation
+survey_dat_filter$Freq<-survey_dat_filter$q2
+survey_dat_filter$Freq<-as.factor(survey_dat_filter$Freq)
+survey_dat_filter$Freq<-recode_factor(survey_dat_filter$Freq, `1` = "Every Year", `2` ="Every Few Years", `3` ="Infrequently (1-2 years only)", `4` = "Never")
+
+#Number of Trips
+survey_dat_filter$Trips<-survey_dat_filter$q2
+survey_dat_filter$Trips<-as.factor(survey_dat_filter$Trips)
+survey_dat_filter$Trips<-recode_factor(survey_dat_filter$Trips, `1` = "1", `2` ="2-10", `3` ="2-10", `4` = "11+", `5`="20+")
+
 ```
 
 Examine the percentage distribution of respondents’ opinions about the creation of MPAs in California before or after volunteering with the California Collaborative Fisheries Research Program by year of initial volunteering
@@ -1146,12 +1197,6 @@ ggplot(q911.4, aes(x=q11, y=change, fill=q4, label = paste0(change, "%")))+
 Recode institution as a managment region: North, Central, or South to examine change in perception based on region of sampling. 
 
 ```{r}
-survey_dat_filter$Region<-survey_dat_filter$q4
-
-survey_dat_filter$Region<-as.factor(survey_dat_filter$Region)
-
-survey_dat_filter$Region<-recode_factor(survey_dat_filter$Region, `1` = "North", `2` ="North", `3` ="Central", `4` = "Central", `5` = "South", `6` ="South")
-                           
 q9.R<-survey_dat_filter%>%select(Region, q9)%>%drop_na()%>%
   group_by(Region)%>%
   count(q9 = factor(q9))%>%
@@ -1167,22 +1212,24 @@ q9.R<-q9.R%>%
   mutate(pct9 = n/sum(n)*100,
         pct9 = round(pct9, digits = 1))
 
-beforR<-ggplot(q9.R, aes(x=q9, y=pct9, fill=Region, label = paste0(pct9, "%")))+
+beforeR<-ggplot(q9.R, aes(x=q9, y=pct9, fill=Region, label = paste0(pct9, "%")))+
   geom_bar(stat="identity", position=position_dodge(1), color="black")+
   scale_x_discrete(labels = beforeafter)+
   scale_y_continuous(limits = c(0,85))+
-  scale_fill_discrete(labels = institution, "Institution")+
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
    labs(x = '', y = 'Percent\n') +
   theme_bw() +
   facet_wrap(~Region, labeller=labeller)+
   geom_text(position = position_dodge(width = 1),
             vjust = -0.5,
-            size = 2)+
+            size = 3)+
   ggtitle("Opinion about MPAs Before Volunteering with CCFRP") +
   theme(panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
+        axis.text = element_text(size = 12),  
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
 
 # Start examining question 11 in relation to the year of initial participation
 q11.R<-survey_dat_filter%>%select(Region, q11)%>%drop_na()%>%
@@ -1201,21 +1248,24 @@ q11.R<-q11.R%>%
         pct11 = round(pct11, digits = 1))
 
 
-after<-ggplot(q11.R, aes(x=q11, y=pct11, fill=Region, label = paste0(pct11, "%")))+
+afterR<-ggplot(q11.R, aes(x=q11, y=pct11, fill=Region, label = paste0(pct11, "%")))+
   geom_bar(stat="identity", position=position_dodge(1), color="black")+
   scale_x_discrete(labels = beforeafter)+
   scale_y_continuous(limits = c(0,85))+
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
   labs(x = '', y = 'Percent\n') +
   theme_bw() +
   facet_wrap(~Region, labeller=labeller)+
   geom_text(position = position_dodge(width = 1),
             vjust = -0.5,
-            size = 2)+
+            size = 3)+
   ggtitle("Opinion about MPAs After Volunteering with CCFRP") +
   theme(panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
-        axis.text = element_text(size = 12))
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
 
 
 #Group the question 9 and 11 to calculate the % change after working with CCFRP.
@@ -1224,7 +1274,7 @@ q911.R<-left_join(q9.R, q11.R,by="Region")%>%
 q911.R$change<-(q911.R$pct11-q911.R$pct9)
 
 
-ggplot(q911.R, aes(x=q11, y=change, fill=Region, label = paste0(change, "%")))+
+changeR<-ggplot(q911.R, aes(x=q11, y=change, fill=Region, label = paste0(change, "%")))+
   geom_bar(stat="identity", position=position_dodge(1), color="black")+
   scale_x_discrete(labels = beforeafter)+
  # scale_y_continuous(limits = c(0,85))+
@@ -1233,18 +1283,23 @@ ggplot(q911.R, aes(x=q11, y=change, fill=Region, label = paste0(change, "%")))+
   scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
   geom_text(position = position_dodge(width = 1),
             vjust = -0.5,
-            size = 2)+
+            size = 3)+
+  geom_hline(yintercept=0, linetype="dashed")+
   ggtitle("Change in opinion about MPAs After Volunteering with CCFRP") +
   theme(panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12),
         legend.position = "none")+
-  facet_wrap(~Region)
+  facet_wrap(~Region)+
+  theme(strip.text.x = element_text(size = 12))
+
+
+beforeR/afterR/changeR
 ```
 
 
-Examine the Magnitude of Change in perception of MPAs after working with CCFRP.
+Examine the Magnitude of Change in perception of MPAs after working with CCFRP all combined and by region
 
 ```{r}
 xx<-survey_dat_filter%>%select(responseid,Region, q9, q11)%>%drop_na()%>%
@@ -1260,13 +1315,22 @@ xx$change<-xx$q9-xx$q11
 xx$q9<-as.factor(xx$q9)
 
 #Overall Response
-ggplot(xx, aes(x=change))+
+mag<-ggplot(xx, aes(x=change))+
   geom_bar(stat="count", aes(fill=q9), color="black")+
   theme_bw()+
   xlim(-4,4)+
   geom_vline(xintercept=0, linetype="dashed", size=0.5)+
-  xlab("Magnitude of Change in Opinions of MPAs")+
-  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)
+  ylab("Number of respondents")+
+  xlab("Magnitude of change in opinions of MPAs")+
+  ggtitle("Direction of Individual Change in Opinion of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))+
+    theme(strip.text.x = element_text(size = 12))
+
+  
 
 #Response by Region
 ggplot(xx, aes(x=change))+
@@ -1277,7 +1341,435 @@ ggplot(xx, aes(x=change))+
   xlab("Magnitude of Change in Opinions of MPAs")+
   scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+facet_wrap(~Region)
 #More Positive or less Positive 
+
+ss911graph/ss911dif/mag
+```
+
+Examine change in perception of MPAs based on the frequency of sampling with CCFRP (q2)
+
+```{r}
+q9.F<-survey_dat_filter%>%select(Freq, q9)%>%drop_na()%>%filter(Freq!="Never")%>%
+  group_by(Freq)%>%
+  count(q9 = factor(q9))%>%
+  spread(q9, n)
+
+q9.F[is.na(q9.F)] <- 0
   
+str(q9.F)
+
+q9.F<-q9.F%>%
+  gather(q9, n, -Freq)%>%
+  group_by(Freq)%>%
+  mutate(pct9 = n/sum(n)*100,
+        pct9 = round(pct9, digits = 1))
+
+beforeF<-ggplot(q9.F, aes(x=q9, y=pct9, fill=Freq, label = paste0(pct9, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+  scale_fill_brewer(palette = "BrBG")+
+   labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Freq, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  ggtitle("Opinion about MPAs Before Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),  
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
+
+# Start examining question 11 in relation to the year of initial participation
+q11.F<-survey_dat_filter%>%select(Freq, q11)%>%drop_na()%>%filter(Freq!="Never")%>%
+  group_by(Freq)%>%
+  count(q11 = factor(q11))%>%
+  spread(q11, n)
+
+q11.F[is.na(q11.F)] <- 0
+  
+str(q11.F)
+
+q11.F<-q11.F%>%
+  gather(q11, n, -Freq)%>%
+  group_by(Freq)%>%
+  mutate(pct11 = n/sum(n)*100,
+        pct11 = round(pct11, digits = 1))
+
+
+afterF<-ggplot(q11.F, aes(x=q11, y=pct11, fill=Freq, label = paste0(pct11, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+scale_fill_brewer(palette = "BrBG")+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Freq, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  ggtitle("Opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
+
+
+#Group the question 9 and 11 to calculate the % change after working with CCFRP.
+q911.F<-left_join(q9.F, q11.F,by="Freq")%>%
+  filter(q9==q11)
+q911.F$change<-(q911.F$pct11-q911.F$pct9)
+
+
+changeF<-ggplot(q911.F, aes(x=q11, y=change, fill=Freq, label = paste0(change, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+ # scale_y_continuous(limits = c(0,85))+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+ scale_fill_brewer(palette = "BrBG")+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  geom_hline(yintercept=0, linetype="dashed")+
+  ggtitle("Change in opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+  facet_wrap(~Freq)+
+  theme(strip.text.x = element_text(size = 12))
+
+
+beforeF/afterF/changeF
+```
+
+Examine change in perception of MPAs based on the Number of Trips with CCFRP (q3)
+
+```{r}
+q9.T<-survey_dat_filter%>%select(Trips, q9)%>%drop_na()%>%
+  group_by(Trips)%>%
+  count(q9 = factor(q9))%>%
+  spread(q9, n)
+
+q9.T[is.na(q9.T)] <- 0
+  
+str(q9.T)
+
+q9.T<-q9.T%>%
+  gather(q9, n, -Trips)%>%
+  group_by(Trips)%>%
+  mutate(pct9 = n/sum(n)*100,
+        pct9 = round(pct9, digits = 1))
+
+beforeT<-ggplot(q9.T, aes(x=q9, y=pct9, fill=Trips, label = paste0(pct9, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+  scale_fill_brewer(palette = "BrBG")+
+   labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Trips, ncol=4, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  ggtitle("Opinion about MPAs Before Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),  
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
+
+# Start examining question 11 in relation to the year of initial participation
+q11.T<-survey_dat_filter%>%select(Trips, q11)%>%drop_na()%>%
+  group_by(Trips)%>%
+  count(q11 = factor(q11))%>%
+  spread(q11, n)
+
+q11.T[is.na(q11.T)] <- 0
+  
+str(q11.T)
+
+q11.T<-q11.T%>%
+  gather(q11, n, -Trips)%>%
+  group_by(Trips)%>%
+  mutate(pct11 = n/sum(n)*100,
+        pct11 = round(pct11, digits = 1))
+
+
+afterT<-ggplot(q11.T, aes(x=q11, y=pct11, fill=Trips, label = paste0(pct11, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+  scale_y_continuous(limits = c(0,85))+
+scale_fill_brewer(palette = "BrBG")+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +
+  facet_wrap(~Trips,ncol=4, labeller=labeller)+
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  ggtitle("Opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+       plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+    theme(strip.text.x = element_text(size = 12))
+
+
+#Group the question 9 and 11 to calculate the % change after working with CCFRP.
+q911.T<-left_join(q9.T, q11.T,by="Trips")%>%
+  filter(q9==q11)
+q911.T$change<-(q911.T$pct11-q911.T$pct9)
+
+
+changeT<-ggplot(q911.T, aes(x=q11, y=change, fill=Trips, label = paste0(change, "%")))+
+  geom_bar(stat="identity", position=position_dodge(1), color="black")+
+  scale_x_discrete(labels = beforeafter)+
+ # scale_y_continuous(limits = c(0,85))+
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() +scale_fill_brewer(palette = "BrBG")+ 
+  geom_text(position = position_dodge(width = 1),
+            vjust = -0.5,
+            size = 3)+
+  geom_hline(yintercept=0, linetype="dashed")+
+  ggtitle("Change in opinion about MPAs After Volunteering with CCFRP") +
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        legend.position = "none")+
+  facet_wrap(~Trips, ncol=4)+
+  theme(strip.text.x = element_text(size = 12))
+
+
+beforeT/afterT/changeT
 ```
 
 
+Examine responses to 16 a b and c (q16, q17 and q18) by region
+
+Think about this when answering a-c: Have you experienced a difference in fishing in an MPA versus outside of an MPA? 
+
+a.  I catch more fish when fishing inside...
+
+b. I catch a greater diversity of fish species when fishing inside...
+
+c. I catch larger fish when I fish inside...
+
+
+```{r fishingarea setup, echo = F}
+
+## answer option list
+fishingarea <- c('MPAs', 'Open to Fishing', 'Don\'t Know', 'No Difference')
+
+ss16a <- survey_dat_filter %>% select(Region, q16) %>% drop_na() %>% group_by(Region)%>%count(q16 = factor(q16))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q16, y = pct, label = paste0(pct, "%"), fill=Region))+
+  geom_col(position = "dodge", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  facet_wrap(~Region)+
+  labs(x = ' ', y = 'Percent\n') +
+  ggtitle("Have you experienced a difference in fishing in an MPA versus outside of an MPA? \n \n Higher Abundance")+
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))
+
+ss16b <- survey_dat_filter %>% select(Region, q17) %>% drop_na() %>% group_by(Region)%>%count(q17 = factor(q17))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q17, y = pct, label = paste0(pct, "%"), fill=Region))+
+  geom_col(position = "dodge", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  facet_wrap(~Region)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = ' ', y = 'Percent\n') +
+   ggtitle("Greater Diversity")+
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))
+
+ss16c <- survey_dat_filter %>% select(Region,q18) %>% drop_na() %>%group_by(Region)%>% count(q18 = factor(q18))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q18, y = pct, label = paste0(pct, "%"), fill=Region))+
+  geom_col(position = "dodge", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  facet_wrap(~Region)+
+  scale_y_continuous(limits = c(0,85)) +
+  scale_x_discrete(labels = fishingarea) +
+  labs(x = ' ', y = 'Percent\n') +
+  ggtitle("Larger Size")+
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))
+```
+
+```{r fishingarea plot, fig.height= 8, fig.width= 9, fig.align= "center", echo = F, eval = F}
+
+ss16a/ss16b/ss16c
+
+```
+
+
+### 23 By Region
+
+In your opinion, how well are California groundfish stocks managed? 
+
+I believe California groundfish stocks are:
+
+```{r management setup, echo = F}
+## question 23 is q26
+managed <- c('Very Well', 'Well', 'Adequately', 'Poorly', 'Very Poorly', 'Not Managed', 'Don\'t Know')
+
+ss23R <- survey_dat_filter %>% select(Region,q26) %>% drop_na() %>% group_by(Region)%>%count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%"), fill=Region))+
+  geom_col(position = "dodge", color="black")+
+  scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() + 
+  ggtitle("Responses By Management Region")+
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))+
+  facet_wrap(~Region)
+
+```
+
+```{r management plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss23/ss23R
+
+```
+
+#Age Group is Q32. # of Trips is Q3, How often is Q2
+
+Q32 - 18-24, 25-34, 35-33, 45-54, 55-64, 65+
+
+Q2 - Every Year, Every Few Years, Infrequently (1-2 years only), Never
+
+Q3- 1, 2-5, 6-10, 11-19, 20+
+
+
+```{r}
+
+#Managed by Age
+ss23A <- survey_dat_filter %>% select(Age,q26) %>% drop_na() %>% group_by(Age)%>%count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%"), fill=Age))+
+  geom_col(position = "dodge", color="black")+
+  scale_fill_brewer(palette = "BrBG")+
+  #scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() + 
+  ggtitle("How well are California groundfish stocks managed? \n  Responses by age group")+
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))+
+  facet_wrap(~Age)
+
+# Managed by Frequency of participation
+ss23F <- survey_dat_filter %>% select(Freq,q26) %>% drop_na() %>% filter(Freq!="Never")%>%group_by(Freq)%>%count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%"), fill=Freq))+
+  geom_col(position = "dodge", color="black")+
+  #scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() + 
+  ggtitle("How well are California groundfish stocks managed? \n Frequency of Participation with CCFRP")+
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))+
+  facet_wrap(~Freq)
+
+# Managed by Number of Trips 
+ss23T <- survey_dat_filter %>% select(Trips,q26) %>% drop_na() %>% group_by(Trips)%>%count(q26 = factor(q26))%>% 
+    mutate(pct = n/sum(n)*100,
+           pct = round(pct, digits = 0))%>%
+  ggplot(aes(x = q26, y = pct, label = paste0(pct, "%"), fill=Trips))+
+  geom_col(position = "dodge", color="black")+
+  #scale_fill_manual(values=c("#2166ac","#fddbc7","#b2182b", "Region"))+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,50)) +
+  scale_x_discrete(labels = managed) +
+  #labs(x = '\nHow Well Managed are California Fisheries?', y = '\nPercent') +
+  labs(x = '', y = 'Percent\n') +
+  theme_bw() + 
+  ggtitle("How well are California groundfish stocks managed? \n Number of CCFRP trips attended")+
+  theme(panel.grid = element_blank(),
+         plot.title = element_text(hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12),
+        strip.text.x = element_text(size = 12))+
+  facet_wrap(~Trips)
+
+#Plot
+ss23A
+ss23T
+ss23F
+```
