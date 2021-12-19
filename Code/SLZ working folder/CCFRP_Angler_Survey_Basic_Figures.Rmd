@@ -210,17 +210,19 @@ ss1012graph <- ss1012df %>%
   mutate(question = factor(question, levels = c("Before", "After"))) %>%
   ggplot(aes(x = type, fill = question, y = pct, label = paste0(pct, "%")))+
   geom_col(position = "dodge", color="black")+
-  scale_fill_manual(values = c("#e0e0e0", "#1a1a1a"))+
+   scale_fill_manual(values = c("#ffffff", "#000000"))+
   geom_text(position = position_dodge(width = 0.9),
             vjust = -0.5,
-            size = 4) +
+            size = 3) +
   scale_y_continuous(limits = c(0,100)) +
   scale_x_discrete( labels = beforeafter_groundfish) +
   labs(x = "", y = 'Percent\n') +
   theme_bw() + 
+  ggtitle("Did you believe the creation of MPAs would affect \n the size/abundance of groundfish inside MPAs? \n \n Before and After Volunteering with CCFRP")+
   theme(panel.grid = element_blank(),
         axis.title=element_text(size=12),
         legend.title = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
         axis.text = element_text(size = 12))
 
 ```
@@ -259,8 +261,9 @@ dfnew = ss12fac %>% add_column(change = ss1012fac)
 
 
 ss1012change <- dfnew %>% 
-  ggplot(aes(x = q12, y = change, label = paste0(round(change, digits = 1), "%")))+
-  geom_col(position = "dodge")+
+  ggplot(aes(x = q12, y = change, label = paste0(round(change, digits = 1), "%"), fill=q12))+
+  geom_col(position = "dodge", color="black")+
+  scale_fill_viridis_d(option="mako",labels=beforeafter_groundfish, direction = -1, " ")+
   geom_text(aes(y = change + 2 * sign(change)), position = position_dodge(width = 0.9),
             size = 4) +
   geom_hline(yintercept = 0)+
@@ -271,7 +274,8 @@ ss1012change <- dfnew %>%
   coord_flip()+
   theme_bw() + 
   theme(panel.grid = element_blank(),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none",
         axis.title=element_text(size=12),
         axis.text = element_text(size = 12))
 
@@ -1343,6 +1347,75 @@ ggplot(xx, aes(x=change))+
 #More Positive or less Positive 
 
 ss911graph/ss911dif/mag
+
+
+xx1<-survey_dat_filter%>%select(responseid,Age, q9, q11)%>%drop_na()%>%
+  filter(q9!="6" & q11!="6")%>%
+  group_by(responseid, Age)
+xx1$q9<-as.numeric(xx1$q9)
+xx1$q11<-as.numeric(xx1$q11)
+
+
+X1 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative')
+
+xx1$change<-xx1$q9-xx1$q11
+xx1$q9<-as.factor(xx1$q9)
+
+#Response by Age Group
+ggplot(xx1, aes(x=change))+
+  geom_bar(stat="count", aes(fill=q9), color="black")+
+  theme_bw()+
+  xlim(-4,4)+
+  geom_vline(xintercept=0, linetype="dashed", size=0.5)+
+  xlab("Magnitude of Change in Opinions of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+facet_wrap(~Age)
+
+#Number of Trips
+
+xx2<-survey_dat_filter%>%select(responseid,Trips, q9, q11)%>%drop_na()%>%
+  filter(q9!="6" & q11!="6")%>%
+  group_by(responseid, Trips)
+xx2$q9<-as.numeric(xx2$q9)
+xx2$q11<-as.numeric(xx2$q11)
+
+
+X1 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative')
+
+xx2$change<-xx2$q9-xx2$q11
+xx2$q9<-as.factor(xx2$q9)
+
+#Response by Number of Trips
+ggplot(xx2, aes(x=change))+
+  geom_bar(stat="count", aes(fill=q9), color="black")+
+  theme_bw()+
+  xlim(-4,4)+
+  geom_vline(xintercept=0, linetype="dashed", size=0.5)+
+  xlab("Magnitude of Change in Opinions of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+facet_wrap(~Trips)
+
+
+###Frequency of Participation
+xx3<-survey_dat_filter%>%select(responseid,Freq, q9, q11)%>%filter(Freq!="Never")%>%drop_na()%>%
+  filter(q9!="6" & q11!="6")%>%
+  group_by(responseid, Freq)
+xx3$q9<-as.numeric(xx3$q9)
+xx3$q11<-as.numeric(xx3$q11)
+
+
+X1 <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative')
+
+xx3$change<-xx3$q9-xx3$q11
+xx3$q9<-as.factor(xx3$q9)
+
+#Response by Age Group
+ggplot(xx3, aes(x=change))+
+  geom_bar(stat="count", aes(fill=q9), color="black")+
+  theme_bw()+
+  xlim(-4,4)+
+  geom_vline(xintercept=0, linetype="dashed", size=0.5)+
+  xlab("Magnitude of Change in Opinions of MPAs")+
+  scale_fill_viridis_d(option="mako", labels = X1, "Initial Response", direction = -1)+facet_wrap(~Freq)
+
 ```
 
 Examine change in perception of MPAs based on the frequency of sampling with CCFRP (q2)
