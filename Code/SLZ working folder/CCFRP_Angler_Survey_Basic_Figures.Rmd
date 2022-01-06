@@ -987,6 +987,7 @@ survey_dat_filter$Age<-survey_dat_filter$q32
 survey_dat_filter$Age<-as.factor(survey_dat_filter$Age)
 survey_dat_filter$Age<-recode_factor(survey_dat_filter$Age, `1` = "18-34", `2` ="18-34", `3` ="35-54", `4` = "35-54", `5` = "55+", `6` ="55+")
 
+
 #Frequency of Participation
 survey_dat_filter$Freq<-survey_dat_filter$q2
 survey_dat_filter$Freq<-as.factor(survey_dat_filter$Freq)
@@ -1102,6 +1103,10 @@ Perception of MPAs Before and After working with CCFRP Based on insitution
 beforeafter <- c('Positive', 'Somewhat \npositive', 'Neutral', 'Somewhat \nnegative', 'Negative', 'No opinion')
 
 institution<- c('Humboldt', "Bodega", "MLML", "Cal Poly", "UCSB", "SIO")
+
+Icount<-survey_dat_filter%>%select(q4)%>%drop_na()%>%
+  group_by(q4)%>%
+  summarize(count=n())
 # Start examining question 9 in relation to the year of initial participation
 q9.4<-survey_dat_filter%>%select(q4, q9)%>%drop_na()%>%
   group_by(q4)%>%
@@ -1845,4 +1850,159 @@ ss23T <- survey_dat_filter %>% select(Trips,q26) %>% drop_na() %>% group_by(Trip
 ss23A
 ss23T
 ss23F
+```
+
+Gender identity - Q31, Male, Female, Non-Binary, Prefer not to answer, other
+Age Group -- Q32 - 18-24, 25-34, 35-33, 45-54, 55-64, 65+
+Education - Q33 - Less than high school degree, High school degree or equivalent (e.g., GED), Associate degree or completion of techincal or professional school, Some college but no degree, Bachelor degree, Graduate degree (e.g., Master degree, PhD, JD, MD, etc,)
+Income - Q34 - Less than $25,000, $25,00-$34,999, $35,000-$49,999, $50,000-$74,999, $75,000-$99,999, $100,000-$149,999 $150,000-$199,999, $200,000 or more, Decline to state
+
+```{r}
+gender <- c("Male", "Female", "Non-Binary", "Prefer not to answer")
+
+ss31 <- survey_dat_clean %>% 
+  select(q31) %>%
+  filter(q31<5)%>%
+  drop_na() %>%
+  separate_rows(q31) %>% 
+  count(q31 = factor(q31))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q31))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q31, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,100)) +
+  scale_x_discrete(labels = gender) +
+  #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  labs(x = 'Gender identity', y = 'Percent\n') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r q31 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss31
+
+```
+
+Age Group
+
+```{r}
+Age <- c("18-24", "25-34", "35-33", "45-54", "55-64", "65+")
+
+ss32 <- survey_dat_clean %>% 
+  select(q32) %>%
+  drop_na() %>%
+  separate_rows(q32) %>% 
+  count(q32 = factor(q32))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q32))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q32, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,40)) +
+  scale_x_discrete(labels = Age) +
+  #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  labs(x = 'Age Group', y = 'Percent\n') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r q32 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss32
+
+```
+
+Education
+
+```{r}
+Education <- c("Less than \nhigh school degree", "High school \ndegree", "Associates degree \nor tech school", "Some college", "Bachelor degree", "Graduate degree")
+
+ss33 <- survey_dat_clean %>% 
+  select(q33) %>%
+  drop_na() %>%
+  separate_rows(q33) %>% 
+  count(q33 = factor(q33))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q33))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q33, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,60)) +
+  scale_x_discrete(labels = Education) +
+  #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  labs(x = 'Education', y = 'Percent\n') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r q33 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss33
+
+```
+
+
+Income
+
+```{r}
+Income <- c("< $25k", "$25k-\n$35k", "$35k-\n$50k", "$50k-\n$75k", "$75k-\n$100k", "$100k-\n$150k" , "$150k-\n$200k", ">$200k", "Decline \nto state")
+
+ss34 <- survey_dat_clean %>% 
+  select(q34) %>%
+  drop_na() %>%
+  separate_rows(q34) %>% 
+  count(q34 = factor(q34))%>% 
+  mutate(pct = n/sum(!is.na(survey_dat_clean$q34))*100,
+         pct = round(pct, digits = 1))%>%
+  ggplot(aes(x = q34, y = pct, label = paste0(pct, "%")))+
+  geom_col(position = "dodge", fill="#0570b0", color="black")+
+  geom_text(position = position_dodge(width = 0.9),
+            vjust = -0.5,
+            size = 4)+
+  scale_y_continuous(limits = c(0,25)) +
+  scale_x_discrete(labels = Income) +
+  #labs(x = '\nWhat aspects of MPAs affected groundfish size/abundance?', y = 'Percent') +
+  labs(x = 'Income', y = 'Percent\n') +
+  theme_bw() + 
+  theme(panel.grid = element_blank(),
+        plot.title = element_text(size = 16, face = "bold", hjust = 0.5),
+        legend.position = "none", 
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 12))
+
+```
+
+```{r q34 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+ss34
+
+```
+
+```{r q31,32,33,34 plot, fig.height= 6, fig.width= 9, fig.align= "center", echo = F}
+
+(ss31|ss32)/(ss33|ss34)
+
 ```
